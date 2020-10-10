@@ -1,0 +1,5 @@
+- Way to build and serve the page with posts and stuff, paginated
+- Way to post a new message
+- Way to store the posts/threads
+
+Look at some JP site BBS or something
