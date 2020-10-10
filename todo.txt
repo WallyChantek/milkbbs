@@ -1,5 +1,25 @@
 - Way to build and serve the page with posts and stuff, paginated
 - Way to post a new message
 - Way to store the posts/threads
+- Config file with settings
+    - Timezone
+    - Enable/disable verification questions
+- Config (JSON?) file with verification questions
+- Pages
+    - Index page (paginated)
+    - Thread-viewing page
+
+- Elements
+    - Index page
+        - Posting form
+            - Name (with tripcode system?)
+            - Email
+            - Topic
+            - Comment
+            - Password (for post deletion)
+            - Verification
+            - File upload (way later pls)
+            - Post preview
+
 
 Look at some JP site BBS or something

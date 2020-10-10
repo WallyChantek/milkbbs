@@ -1,0 +1,24 @@
+[
+    {
+        "id": 1,
+        "name": "Wallu",
+        "email": "wallu@chentak.com",
+        "url": "http://google.com",
+        "subject": "First Post GET!",
+        "comment": "I am the master of this board!",
+        "password": "coolbeans"
+    },
+    {
+        "id": 2,
+        "name": "Johnny",
+        "comment": "This is a cool board"
+    },
+    {
+        "id": 3,
+        "name": "Matt",
+        "email": "matt45@compuserve.cjb.net",
+        "subject": "Cool board",
+        "comment": "I like this board!",
+        "password": "mattpass"
+    }
+]

@@ -1,0 +1,67 @@
+#milkbbs-posting-form td:nth-child(1) {
+    width: 1px;
+}
+
+#milkbbs-posting-form td:nth-child(2) input,
+#milkbbs-posting-form td:nth-child(2) textarea {
+    width: 100%;
+}
+
+#milkbbs-posting-form td:nth-child(2) textarea {
+    resize: none;
+}
+
+.milkbbs-thread-container * {
+    box-sizing: border-box;
+}
+
+.milkbbs-post div {
+    display: flex;
+    justify-content: space-between;
+}
+
+.milkbbs-reply div {
+    justify-content: right;
+}
+
+
+
+
+/* -- THEME CSS: BREAK INTO SEPARATE FILE WHEN DONE!!!! -- */
+#milkbbs-posting-form *,
+.milkbbs-thread-container * {
+    font-family: Tahoma;
+    font-size: 11px;
+}
+
+.milkbbs-thread-container {
+    border: 1px solid #a0a0a0;
+    border-bottom: none;
+    margin-bottom: 40px;
+}
+
+.milkbbs-post {
+    padding: 4px;
+    border-bottom: 1px solid #a0a0a0;
+}
+
+.milkbbs-post-name {
+    font-weight: bold;
+}
+
+.milkbbs-post-comment {
+    background: #e0e0e0;
+    padding: 4px;
+    margin: 4px 0;
+}
+
+
+
+/* -- USERSTYLE CSS: REMOVE ME WHEN DONE!!!! -- */
+#milkbbs-posting-form {
+    width: 480px;
+}
+
+.milkbbs-thread-container {
+    width: 480px;
+}

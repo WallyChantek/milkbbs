@@ -1,7 +1,7 @@
 <?php
 
-    return array(
-        "hello" => "world"
-    );
+return array(
+    "hello" => "world"
+);
 
 ?>
