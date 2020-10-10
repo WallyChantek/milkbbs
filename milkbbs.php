@@ -45,28 +45,7 @@ function _generateIndexPage()
         $thread = json_decode($thread, true);
         // TODO: Error handling
         
-        $html .= '<div class="milkbbs-thread-container">';
-        foreach ($thread as $post)
-        {
-            $html .= '<div class="milkbbs-post">'
-                   .   '<div>'
-                   .     '<div><span class="milkbbs-post-name">' . $post['name'] . (array_key_exists('url', $post) ? '</span>&nbsp;<a class="milkbbs-post-url" href="' . $post['url'] . '">[URL]</a>' : '') . '</div>'
-                   .     '<div><span class="milkbbs-post-number">No. ' . $post['id'] . '<span>&nbsp;<a href="#">#</a></div>'
-                   .   '</div>'
-                   .   '<div>'
-                   .     '<span class="milkbbs-post-subject">' . $post['subject'] . '</span>'
-                   .   '</div>'
-                   .   '<div class="milkbbs-post-comment">' . $post['comment'] . '</div>'
-                   .   '<div>'
-                   .     '<span class="milkbbs-post-date">January 27, 1997, 13:27</span>'
-                   .     '<span class="milkbbs-post-delete">[Delete]</span>'
-                   .   '</div>'
-                   . '</div>'
-            ;
-        }
-        $html .= '<div class="milkbbs-post milkbbs-reply"><div>[Reply to this thread...]</div></div>';
-        $html .= '</div>';
-        
+        $html .= _generateThread($thread);
     }
     
     echo $html;
@@ -94,15 +73,53 @@ function _generatePostingForm()
           . '<table id="milkbbs-posting-form">'
           . '<tr><td>Name</td><td><input name="name" type="text" placeholder="Anonymous" /></td>'
           . '<tr><td>Email</td><td><input name="email" type="text" /></td>'
+          . '<tr><td>Homepage</td><td><input name="url" type="text" /></td>'
           . '<tr><td>Subject</td><td><input name="subject" type="text" /></td>'
           . '<tr><td>Comment</td><td><textarea name="comment"></textarea></td>'
-          . '<tr><td>Password</td><td><input name="subject" type="text" placeholder="(optional, for post deletion)" /></td>'
+          . '<tr><td>Password</td><td><input name="password" type="text" placeholder="(optional, for post deletion)" /></td>'
           . '<tr><td colspan="2">What is the name of Mario\'s green brother?</td></tr>'
           . '<tr><td colspan="2"><input name="verification" type="text" /></td>'
-          . '<tr><td colspan="2"><input type="submit" /></td></tr>'
+          . '<tr><td colspan="2"><input name="threadId" type="hidden" value="" /><input type="submit" /></td></tr>'
           . '</table>'
           . '</form>'
     ;
+    
+    return $html;
+}
+
+function _generateThread($thread)
+{
+    $html = '<div class="milkbbs-thread-container">';
+    foreach ($thread as $post)
+    {
+        $html .= '<div class="milkbbs-post">';
+        
+        // Line 01: Name, URL, post number, anchor link
+        $html .= '<div>';
+        $html .= '<div>'
+            . (array_key_exists('email', $post) ? '<a href="mailto:' . $post['email'] . '" ' : '<span ')
+            . 'class="milkbbs-post-name">' . $post['name']
+            . (array_key_exists('email', $post) ? '</a>' : '</span>')
+            . (array_key_exists('url', $post) ? '&nbsp;<a class="milkbbs-post-url" href="' . $post['url'] . '">[URL]</a>' : '')
+            . '</div>';
+        $html .= '<div><span class="milkbbs-post-number">No. ' . $post['id'] . '<span>&nbsp;<a href="#">#</a></div>';
+        $html .= '</div>';
+        // Line 02: Subject
+        $html .= '<div>';
+        $html .= '<span class="milkbbs-post-subject">' . $post['subject'] . '</span>';
+        $html .= '</div>';
+        // Line 03: Comment
+        $html .= '<div class="milkbbs-post-comment">' . $post['comment'] . '</div>';
+        // Line 04: Date, delete button
+        $html .= '<div>';
+        $html .= '<span class="milkbbs-post-date">January 27, 1997, 13:27</span>';
+        $html .= '<span class="milkbbs-post-delete">[Delete]</span>';
+        $html .= '</div>';
+        
+        $html .= '</div>';
+    }
+    $html .= '<div class="milkbbs-post milkbbs-reply"><div>[Reply to this thread...]</div></div>';
+    $html .= '</div>';
     
     return $html;
 }

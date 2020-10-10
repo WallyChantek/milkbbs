@@ -20,6 +20,7 @@
             - Verification
             - File upload (way later pls)
             - Post preview
+- Lock indicator to indicate another post is processing and for the script to wait
 
 
 Look at some JP site BBS or something

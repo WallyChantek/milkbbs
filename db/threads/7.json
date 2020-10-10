@@ -1,0 +1,11 @@
+[
+    {
+        "id": 7,
+        "name": "Wally",
+        "email": "wally@email.com",
+        "url": "http:\/\/wallychantek.com",
+        "subject": "Testing PHP-generated Thread",
+        "comment": "Hello world!",
+        "password": "test"
+    }
+]
