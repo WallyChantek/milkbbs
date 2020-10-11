@@ -1,8 +1,24 @@
 <?php
 
+date_default_timezone_set('America/New_York');
 
 if ($_POST) {
-    date_default_timezone_set('America/New_York');
+    $success = savePost();
+    
+    // Redirect to main page
+    if ($success)
+    {
+        header( 'Location: ' . dirname($_SERVER['PHP_SELF']), true, 303 );
+        exit();
+    }
+}
+else
+{
+    displayError('No POST data provided.');
+}
+
+function savePost()
+{
     $dt = date('Y-m-d (D) H:i:s');
     
     $postNum;
@@ -102,8 +118,34 @@ if ($_POST) {
     // Write to current post number/count text file with incremented number
     file_put_contents('db/postnum.txt', $postNum);
     
-    // Redirect to main page
-    header( 'Location: ' . dirname($_SERVER['PHP_SELF']), true, 303 );
-    exit();
+    return true;
 }
+
+function displayError($msg = '')
+{
+    $html = '<!DOCTYPE html>'
+          . '<html lang="en">'
+          . '<head>'
+          . '<title>milkBBS</title>'
+          . '<meta charset="utf-8">'
+          . '<link rel="stylesheet" href="/milkbbs/milkbbs.css">'
+          . '</head>'
+          . '<body>'
+    ;
+    
+    $html .= '<div class="milkbbs-error-container milkbbs-standalone-error-container">'
+           // . '<div class="milkbbs-error-logo">milkBBS</div>'
+           . '<div class="milkbbs-error-title">milkBBS</div>'
+           . '<div class="milkbbs-error-message">Error: ' . $msg . '</div>'
+           . '<div class="milkbbs-error-return-link"><a href="javascript:history.back()">[Return]</a></div>'
+           . '</div>'
+    ;
+    
+    $html .= '</body>'
+           . '</html>'
+    ;
+    
+    echo $html;
+}
+
 ?>

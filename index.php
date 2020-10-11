@@ -9,7 +9,7 @@
 <?php
 
 include('milkbbs.php');
-echo initMilkBBS();
+echo loadMilkBBS();
 
 ?>
 

@@ -5,9 +5,6 @@
     - Timezone
     - Enable/disable verification questions
 - Config (JSON?) file with verification questions
-- Pages
-    - Index page (paginated)
-    - Thread-viewing page
 
 - Elements
     - Index page

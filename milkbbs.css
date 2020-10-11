@@ -1,13 +1,13 @@
-#milkbbs-posting-form td:nth-child(1) {
+.milkbbs-posting-form td:nth-child(1) {
     width: 1px;
 }
 
-#milkbbs-posting-form td:nth-child(2) input,
-#milkbbs-posting-form td:nth-child(2) textarea {
+.milkbbs-posting-form td:nth-child(2) input,
+.milkbbs-posting-form td:nth-child(2) textarea {
     width: 100%;
 }
 
-#milkbbs-posting-form td:nth-child(2) textarea {
+.milkbbs-posting-form td:nth-child(2) textarea {
     resize: none;
 }
 
@@ -28,8 +28,9 @@
 
 
 /* -- THEME CSS: BREAK INTO SEPARATE FILE WHEN DONE!!!! -- */
-#milkbbs-posting-form *,
-.milkbbs-thread-container * {
+.milkbbs-posting-form *,
+.milkbbs-thread-container *,
+.milkbbs-error-container * {
     font-family: Tahoma;
     font-size: 11px;
 }
@@ -55,13 +56,28 @@
     margin: 4px 0;
 }
 
+.milkbbs-error-container {
+    border: 1px solid #a0a0a0;
+    padding: 4px;
+}
+
+.milkbbs-standalone-error-container {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.milkbbs-error-container div {
+    display: flex;
+    justify-content: center;
+}
+
 
 
 /* -- USERSTYLE CSS: REMOVE ME WHEN DONE!!!! -- */
-#milkbbs-posting-form {
-    width: 480px;
-}
-
-.milkbbs-thread-container {
+.milkbbs-posting-form,
+.milkbbs-thread-container,
+.milkbbs-error-container {
     width: 480px;
 }

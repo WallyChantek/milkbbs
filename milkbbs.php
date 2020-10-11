@@ -2,77 +2,97 @@
 
 $config = include('config.php');
 
-function initMilkBBS()
+function loadMilkBBS()
 {
-    if ($_GET['page'] === 'thread' &&
-        array_key_exists('id', $_GET) &&
-        is_numeric($_GET['id']))
+    if ($_GET['page'] === 'thread' && is_numeric($_GET['id']))
     {
-        _generateThreadPage();
+        generateThreadViewPage();
     }
     else if ($_GET['page'] === 'admin')
     {
-        _generateAdminPage();
+        generateAdminPage();
     }
     else
     {
-        _generateIndexPage();
+        generateIndexPage();
     }
 }
 
-function _generatePage($body)
+/*
+    Generates and outputs the HTML markup for the "main" landing page (the
+    thread list, or catalog page).
+*/
+function generateIndexPage()
 {
-    $html = '';
-    
-    return $html;
-}
-
-function _generateIndexPage()
-{
-    $pwd = dirname($_SERVER['PHP_SELF']);
-    
-    $html = '';
-    $html .= '<p>Index page!</p>';
-    
-    // Posting form
-    $html .= _generatePostingForm();
+    $html = generatePostingForm();
     
     // Threads
-    $threadList = json_decode(file_get_contents('db/toc.json'));
-    foreach ($threadList as $id)
+    if (file_exists('db/toc.json'))
     {
-        $thread = file_get_contents("db/threads/$id.json");
-        $thread = json_decode($thread, true);
-        // TODO: Error handling
+        $threadList = json_decode(file_get_contents('db/toc.json'));
+        if (!$threadList)
+        {
+            displayError('Corrupted index. Please contact the server administrator if this issue persists.');
+        }
         
-        $html .= _generateThread($thread, true, 3);
+        foreach ($threadList as $id)
+        {
+            $thread = '';
+            
+            if (file_exists("db/threads/$id.json"))
+            {
+                $thread = json_decode(file_get_contents("db/threads/$id.json"), true);
+            }
+            
+            if ($thread)
+            {
+                $html .= generateThread($thread, true, 3);
+            }
+            else
+            {
+                $html .= '<div class="milkbbs-thread-container">'
+                       . '<div class="milkbbs-entry">'
+                       . "<div>Post number ($id) could not be displayed due to errors.</div>"
+                       . '</div>'
+                       . '</div>'
+                ;
+            }
+        }
     }
     
     echo $html;
 }
 
-function _generateThreadPage()
+/*
+    Generates and outputs the HTML markup for any thread-viewing pages.
+*/
+function generateThreadViewPage()
 {
-    $pwd = dirname($_SERVER['PHP_SELF']);
-    
-    $html = '';
-    $html .= '<p>Thread page!</p>';
-    
-    // Posting form
-    $html .= _generatePostingForm($_GET['id']);
+    $id = $_GET['id'];
+    $html = generatePostingForm($id);
     
     // Threads
-    if (file_exists('db/threads/' . $_GET['id'] . '.json'))
-        $thread = json_decode(file_get_contents('db/threads/' . $_GET['id'] . '.json'), true);
+    if (file_exists("db/threads/$id.json"))
+    {
+        $thread = json_decode(file_get_contents("db/threads/$id.json"), true);
+    }
     
-    // TODO: Error handling
-    
-    $html .= _generateThread($thread, false);
+    if ($thread)
+    {
+        $html .= generateThread($thread, false);
+    }
+    else
+    {
+        displayError('This thread could not be displayed due to errors. Please contact the server administrator if this issue persists.');
+    }
     
     echo $html;
 }
 
-function _generateAdminPage()
+/*
+    Generates and outputs the HTML markup for the administrative control panel.
+*/
+function generateAdminPage()
 {
     $html = '';
     $html .= '<p>Admin page!</p>';
@@ -80,10 +100,15 @@ function _generateAdminPage()
     echo $html;
 }
 
-function _generatePostingForm($threadId = '')
+/*
+    Generates the form used for making new posts, both for creating new threads
+    and for replying to existing threads.
+*/
+// TODO: Continue cleanup here
+function generatePostingForm($threadId = '')
 {
     $html = '<form method="post" action="' . dirname($_SERVER['PHP_SELF']) . '/post-comment.php">'
-          . '<table id="milkbbs-posting-form">'
+          . '<table class="milkbbs-posting-form">'
           . '<tr><td>Name</td><td><input name="name" type="text" placeholder="Anonymous" /></td>'
           . '<tr><td>Email</td><td><input name="email" type="text" /></td>'
           . '<tr><td>Homepage</td><td><input name="url" type="text" /></td>'
@@ -100,7 +125,7 @@ function _generatePostingForm($threadId = '')
     return $html;
 }
 
-function _generateThread($thread, $showReply = true, $limit = 0)
+function generateThread($thread, $showReply = true, $limit = 0)
 {
     $limit = ($limit <= 0 ? count($thread) : $limit);
     $html = '<div class="milkbbs-thread-container">';
@@ -108,17 +133,17 @@ function _generateThread($thread, $showReply = true, $limit = 0)
     for ($i = 0; $i < min(count($thread), $limit); $i++)
     {
         $post = $thread[$i];
-        $html .= '<div class="milkbbs-entry">';
+        $html .= '<div class="milkbbs-entry" id="' . $post['id'] . '">';
         
         // Line 01: Name, URL, post number, anchor link
         $html .= '<div>';
         $html .= '<div>'
-            . (array_key_exists('email', $post) ? '<a href="mailto:' . $post['email'] . '" ' : '<span ')
+            . (isset($post['email']) ? '<a href="mailto:' . $post['email'] . '" ' : '<span ')
             . 'class="milkbbs-post-name">' . $post['name']
-            . (array_key_exists('email', $post) ? '</a>' : '</span>')
-            . (array_key_exists('url', $post) ? '&nbsp;<a class="milkbbs-post-url" href="' . $post['url'] . '">[URL]</a>' : '')
+            . (isset($post['email']) ? '</a>' : '</span>')
+            . (isset($post['url']) ? '&nbsp;<a class="milkbbs-post-url" href="' . $post['url'] . '">[URL]</a>' : '')
             . '</div>';
-        $html .= '<div><span class="milkbbs-post-number">No. ' . $post['id'] . '<span>&nbsp;<a href="#">#</a></div>';
+        $html .= '<div><span class="milkbbs-post-number">No. ' . $post['id'] . '<span>&nbsp;<a href="' . dirname($_SERVER['PHP_SELF']) . '/' . basename($_SERVER['PHP_SELF']) . '?page=thread&id=' . $threadId . '#' . $post['id'] . '">#</a></div>';
         $html .= '</div>';
         // Line 02: Subject
         $html .= '<div>';
@@ -139,6 +164,19 @@ function _generateThread($thread, $showReply = true, $limit = 0)
     $html .= '</div>';
     
     return $html;
+}
+
+function displayError($msg = '')
+{
+    $html = '<div class="milkbbs-error-container">'
+           // . '<div class="milkbbs-error-logo">milkBBS</div>'
+           . '<div class="milkbbs-error-title">milkBBS</div>'
+           . '<div class="milkbbs-error-message">Error: ' . $msg . '</div>'
+           . '</div>'
+    ;
+    
+    echo $html;
+    exit();
 }
 
 ?>
