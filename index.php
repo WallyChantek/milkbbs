@@ -3,7 +3,7 @@
 <head>
 <title>milkBBS</title>
 <meta charset="utf-8">
-<link rel="stylesheet" href="milkbbs/milkbbs.css">
+<link rel="stylesheet" href="/milkbbs/milkbbs.css">
 </head>
 <body>
 <?php

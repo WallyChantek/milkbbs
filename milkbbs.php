@@ -45,7 +45,7 @@ function _generateIndexPage()
         $thread = json_decode($thread, true);
         // TODO: Error handling
         
-        $html .= _generateThread($thread, 3);
+        $html .= _generateThread($thread, true, 3);
     }
     
     echo $html;
@@ -53,8 +53,21 @@ function _generateIndexPage()
 
 function _generateThreadPage()
 {
+    $pwd = dirname($_SERVER['PHP_SELF']);
+    
     $html = '';
     $html .= '<p>Thread page!</p>';
+    
+    // Posting form
+    $html .= _generatePostingForm($_GET['id']);
+    
+    // Threads
+    if (file_exists('db/threads/' . $_GET['id'] . '.json'))
+        $thread = json_decode(file_get_contents('db/threads/' . $_GET['id'] . '.json'), true);
+    
+    // TODO: Error handling
+    
+    $html .= _generateThread($thread, false);
     
     echo $html;
 }
@@ -67,7 +80,7 @@ function _generateAdminPage()
     echo $html;
 }
 
-function _generatePostingForm()
+function _generatePostingForm($threadId = '')
 {
     $html = '<form method="post" action="' . dirname($_SERVER['PHP_SELF']) . '/post-comment.php">'
           . '<table id="milkbbs-posting-form">'
@@ -79,7 +92,7 @@ function _generatePostingForm()
           . '<tr><td>Password</td><td><input name="password" type="text" placeholder="(optional, for post deletion)" /></td>'
           . '<tr><td colspan="2">What is the name of Mario\'s green brother?</td></tr>'
           . '<tr><td colspan="2"><input name="verification" type="text" /></td>'
-          . '<tr><td colspan="2"><input name="threadId" type="hidden" value="" /><input type="submit" /></td></tr>'
+          . '<tr><td colspan="2"><input name="threadId" type="hidden" value="' . $threadId . '" /><input type="submit" /></td></tr>'
           . '</table>'
           . '</form>'
     ;
@@ -87,14 +100,15 @@ function _generatePostingForm()
     return $html;
 }
 
-function _generateThread($thread, $limit = 0)
+function _generateThread($thread, $showReply = true, $limit = 0)
 {
     $limit = ($limit <= 0 ? count($thread) : $limit);
     $html = '<div class="milkbbs-thread-container">';
+    $threadId = $thread[0]['id'];
     for ($i = 0; $i < min(count($thread), $limit); $i++)
     {
         $post = $thread[$i];
-        $html .= '<div class="milkbbs-post">';
+        $html .= '<div class="milkbbs-entry">';
         
         // Line 01: Name, URL, post number, anchor link
         $html .= '<div>';
@@ -120,7 +134,8 @@ function _generateThread($thread, $limit = 0)
         
         $html .= '</div>';
     }
-    $html .= '<div class="milkbbs-post milkbbs-reply"><div>[Reply to this thread...]</div></div>';
+    if ($showReply)
+        $html .= '<div class="milkbbs-entry milkbbs-reply"><div><a class="milkbbs-reply" href="' . dirname($_SERVER['PHP_SELF']) . '/' . basename($_SERVER['PHP_SELF']) . '?page=thread&id=' . $threadId . '">[Reply to this thread...]</a></div></div>';
     $html .= '</div>';
     
     return $html;

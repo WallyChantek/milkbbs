@@ -24,3 +24,11 @@
 
 
 Look at some JP site BBS or something
+
+
+
+
+milkbbs
+milkbbs?page=thread&id=3
+milkbbs?page=admin
+milkbbs?page=admin&user=blah&pass=blah

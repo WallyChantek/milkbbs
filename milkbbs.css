@@ -15,7 +15,7 @@
     box-sizing: border-box;
 }
 
-.milkbbs-post div {
+.milkbbs-entry div {
     display: flex;
     justify-content: space-between;
 }
@@ -40,7 +40,7 @@
     margin-bottom: 40px;
 }
 
-.milkbbs-post {
+.milkbbs-entry {
     padding: 4px;
     border-bottom: 1px solid #a0a0a0;
 }

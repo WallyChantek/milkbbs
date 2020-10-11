@@ -42,7 +42,18 @@ if ($_POST) {
     // Post is a reply to an existing thread.
     if (!empty($_POST['threadId']) && is_numeric($_POST['threadId']))
     {
-        
+        if (file_exists('db/threads/' . $_POST['threadId'] . '.json'))
+        {
+            $threadData = json_decode(file_get_contents('db/threads/' . $_POST['threadId'] . '.json'));
+            array_push($threadData, $newPost);
+            error_log(print_r($threadData, true));
+            $threadData = json_encode($threadData, JSON_PRETTY_PRINT);
+            file_put_contents('db/threads/' . $_POST['threadId'] . '.json', $threadData);
+        }    
+        else
+        {
+            // TODO: Throw error
+        }
     }
     // Post is for a new thread.
     else
@@ -74,7 +85,9 @@ if ($_POST) {
         // If thread exists in ToC, bump it to the top
         if ($threadPos)
         {
-            
+            unset($toc[$threadPos]);
+            array_unshift($toc, intval($_POST['threadId']));
+            array_values($toc);
         }
         // If thread doesn't exist in ToC, add it to the top
         else
