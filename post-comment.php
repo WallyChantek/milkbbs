@@ -1,5 +1,10 @@
 <?php
+
+
 if ($_POST) {
+    date_default_timezone_set('America/New_York');
+    $dt = date('Y-m-d (D) H:i:s');
+    
     $postNum;
     $toc;
     if (file_exists('db/postnum.txt'))
@@ -30,6 +35,7 @@ if ($_POST) {
     if (!empty($_POST['subject']))
         $newPost['subject'] = $_POST['subject'];
     $newPost['comment'] = $_POST['comment'];
+    $newPost['date'] = $dt;
     if (!empty($_POST['password']))
         $newPost['password'] = $_POST['password'];
     

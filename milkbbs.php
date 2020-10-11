@@ -45,7 +45,7 @@ function _generateIndexPage()
         $thread = json_decode($thread, true);
         // TODO: Error handling
         
-        $html .= _generateThread($thread);
+        $html .= _generateThread($thread, 3);
     }
     
     echo $html;
@@ -87,11 +87,13 @@ function _generatePostingForm()
     return $html;
 }
 
-function _generateThread($thread)
+function _generateThread($thread, $limit = 0)
 {
+    $limit = ($limit <= 0 ? count($thread) : $limit);
     $html = '<div class="milkbbs-thread-container">';
-    foreach ($thread as $post)
+    for ($i = 0; $i < min(count($thread), $limit); $i++)
     {
+        $post = $thread[$i];
         $html .= '<div class="milkbbs-post">';
         
         // Line 01: Name, URL, post number, anchor link
@@ -112,7 +114,7 @@ function _generateThread($thread)
         $html .= '<div class="milkbbs-post-comment">' . $post['comment'] . '</div>';
         // Line 04: Date, delete button
         $html .= '<div>';
-        $html .= '<span class="milkbbs-post-date">January 27, 1997, 13:27</span>';
+        $html .= '<span class="milkbbs-post-date">' . $post['date'] . '</span>';
         $html .= '<span class="milkbbs-post-delete">[Delete]</span>';
         $html .= '</div>';
         
