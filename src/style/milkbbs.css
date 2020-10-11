@@ -11,6 +11,7 @@
     resize: none;
 }
 
+.milkbbs-thread-container,
 .milkbbs-thread-container * {
     box-sizing: border-box;
 }
@@ -28,6 +29,13 @@
 
 
 /* -- THEME CSS: BREAK INTO SEPARATE FILE WHEN DONE!!!! -- */
+hr {
+    border: none;
+    border-top: 1px dotted #c0c0c0;
+    /* height: 1px; */
+    /* background: #e0e0e0; */
+}
+
 .milkbbs-posting-form *,
 .milkbbs-thread-container *,
 .milkbbs-error-container * {
@@ -35,10 +43,23 @@
     font-size: 11px;
 }
 
+.milkbbs-posting-form {
+    width: 100%;
+    padding: 0 24px;
+    margin-bottom: 40px;
+}
+
 .milkbbs-thread-container {
     border: 1px solid #a0a0a0;
     border-bottom: none;
-    margin-bottom: 40px;
+}
+
+.milkbbs-thread-container:not(:first-child) {
+    margin-top: 20px;
+}
+
+.milkbbs-thread-container:not(:last-child) {
+    margin-bottom: 20px;
 }
 
 .milkbbs-entry {
@@ -76,8 +97,28 @@
 
 
 /* -- USERSTYLE CSS: REMOVE ME WHEN DONE!!!! -- */
-.milkbbs-posting-form,
-.milkbbs-thread-container,
-.milkbbs-error-container {
+/* .milkbbs-posting-form, */
+/* .milkbbs-thread-container, */
+/* .milkbbs-error-container { */
+    /* width: 480px; */
+/* } */
+
+* {
+    font-family: Tahoma;
+}
+
+body {
+    background: #e8e8e8;
+}
+
+h1 {
+    margin: 0.75rem 0;
+    border-bottom: 1px dotted #a0a0a0;
+}
+
+.wrapper {
     width: 480px;
+    background: #ffffff;
+    padding: 8px;
+    margin: 0 auto;
 }
