@@ -20,7 +20,7 @@ $data['path']['originFile'] = $_SERVER['PHP_SELF'];
 $data['path']['threads'] = $fsLib . 'db/threads/';
 
 $data['file']['toc'] = $fsLib . 'db/toc.json';
-$data['file']['postCount'] = $fsLib . 'db/postcount.txt';
+$data['file']['postCount'] = $fsLib . 'db/postcounter.txt';
 
 // HTML Templates
 $data['postTemplate'] =
@@ -29,8 +29,12 @@ $data['postTemplate'] =
   .         '<div class="milkbbs-post-name"><a href="mailto:{POST_EMAIL}">{POST_AUTHOR}</a>&nbsp;<a class="milkbbs-post-url" href="{POST_URL}">[URL]</a></div>'
   .         '<div class="milkbbs-post-number">No. {POST_ID}&nbsp;<a href="{POST_ANCHOR_LINK}">#</a></div>'
   .     '</div>'
-  .     '<div class="milkbbs-post-subject">{POST_SUBJECT}</div>'
-  .     '<div class="milkbbs-post-comment">{POST_COMMENT}</div>'
+  .     '<div>'
+  .         '<div class="milkbbs-post-subject">{POST_SUBJECT}</div>'
+  .     '</div>'
+  .     '<div>'
+  .         '<div class="milkbbs-post-comment">{POST_COMMENT}</div>'
+  .     '</div>'
   .     '<div>'
   .         '<div class="milkbbs-post-date">{POST_DATE}</div>'
   .         '<div class="milkbbs-post-delete">{POST_DELETE}</div>'

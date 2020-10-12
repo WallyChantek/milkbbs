@@ -36,7 +36,7 @@ function insertIndexPage($cfg)
     if (file_exists($cfg['file']['toc']))
     {
         $toc = json_decode(file_get_contents($cfg['file']['toc']));
-        if (!$toc)
+        if (!is_array($toc))
         {
             displayError($cfg, 'Corrupted table of contents.', true);
         }
@@ -114,24 +114,43 @@ function insertAdminPage($cfg)
 */
 function getPostForm($cfg, $threadId = '')
 {
+    if ($cfg['antiBotEnabled'])
+    {
+        $questions = require_once(dirname(__FILE__) . '/../verification-questions.php');
+        $qid = array_rand($questions);
+        $q = $questions[$qid][0];
+    }
+    
     $html = '<form method="post" action="' . $cfg['path']['webLib'] . 'function/process-post.php">'
           . '<table class="milkbbs-posting-form">'
-          . '<tr><td>Name</td><td><input name="name" type="text" placeholder="Anonymous" /></td>'
-          . '<tr><td>Email</td><td><input name="email" type="text" /></td>'
-          . '<tr><td>Homepage</td><td><input name="url" type="text" /></td>'
-          . '<tr><td>Subject</td><td><input name="subject" type="text" /></td>'
+          . '<tr><td>Name</td><td><input name="name" type="text" placeholder="Anonymous"></td>'
+          . '<tr><td>Email</td><td><input name="email" type="text"></td>'
+          . '<tr><td>Homepage</td><td><input name="url" type="text"></td>'
+          . '<tr><td>Subject</td><td><input name="subject" type="text"></td>'
           . '<tr><td>Comment</td><td><textarea name="comment"></textarea></td>'
-          . '<tr><td>Password</td><td><input name="password" type="text" placeholder="(optional, for post deletion)" /></td>'
-          . '<tr><td colspan="2">What is the name of Mario\'s green brother?</td></tr>'
-          . '<tr><td colspan="2"><input name="verification" type="text" /></td>'
+          . '<tr><td>Password</td><td><input name="password" type="text" placeholder="(optional, for post deletion)"></td>'
+          . '{VERIFICATION}'
           . '<tr><td colspan="2">'
-          .     '<input name="threadId" type="hidden" value="' . $threadId . '" />'
-          .     '<input name="callingScript" type="hidden" value="' . $cfg['path']['originFile'] . '" />'
-          .     '<input type="submit" />'
+          .     '<input name="threadId" type="hidden" value="' . $threadId . '">'
+          .     '<input name="callingScript" type="hidden" value="' . $cfg['path']['originFile'] . '">'
+          .     '<input type="submit">'
           . '</td></tr>'
           . '</table>'
           . '</form>'
     ;
+    
+    if (isset($qid))
+    {
+        $v = '<tr><td colspan="2">' . $q . '<input name="verification-question-id" type="hidden" value="' . $qid . '"></td></tr>'
+           . '<tr><td colspan="2"><input name="verification-answer" type="text"></td>'
+        ;
+        
+        $html = str_replace('{VERIFICATION}', $v, $html);
+    }
+    else
+    {
+        $html = str_replace('{VERIFICATION}', '', $html);
+    }
     
     return $html;
 }
@@ -162,6 +181,16 @@ function getThread($cfg, $threadData, $showAllReplies = true)
             $html = str_replace('&nbsp;<a class="milkbbs-post-url" href="{POST_URL}">[URL]</a>', '', $html);
         }
         
+        // Escape HTML characters in strings so they aren't parsed.
+        foreach ($p as $key => $val)
+        {
+            if (is_string($val))
+            {
+                $p[$key] = htmlspecialchars($val);
+            }
+        }
+        
+        // Replace template tags with post data.
         $html = str_replace('{POST_ID}', $p['id'], $html);
         $html = str_replace('{POST_AUTHOR}', $p['name'], $html);
         $html = str_replace('{POST_EMAIL}', $p['email'], $html);
@@ -170,7 +199,6 @@ function getThread($cfg, $threadData, $showAllReplies = true)
         $html = str_replace('{POST_COMMENT}', $p['comment'], $html);
         $html = str_replace('{POST_DATE}', $p['date'], $html);
         $html = str_replace('{POST_DELETE}', '[Delete]', $html);
-        
         $html = str_replace('{POST_ANCHOR_LINK}', $cfg['path']['originFile'] . '?page=thread&id=' . $threadId . '#' . $p['id'], $html);
     }
     
@@ -183,7 +211,7 @@ function getThread($cfg, $threadData, $showAllReplies = true)
     
     if (!$showAllReplies && $cfg['addHrAfterThreads'])
     {
-        $html .= '<hr>';
+        $html .= '<hr class="milkbbs-hr">';
     }
     
     return $html;

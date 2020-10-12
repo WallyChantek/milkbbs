@@ -1,30 +1,34 @@
-- Way to build and serve the page with posts and stuff, paginated
-- Way to post a new message
-- Way to store the posts/threads
-- Config file with settings
-    - Timezone
-    - Enable/disable verification questions
-- Config (JSON?) file with verification questions
+- TODO -------------------------------------------------------------------------
+[/] Server-side post data validation
+    [x] Basic fields
+    [ ] Files
+[x] Anti-bot verification
+    [x] User-defined questions
+    [x] Main functionality
+[x] Ensure HTML in comments isn't parsed
+[ ] Index page pagination
+[ ] Formatting codes with simple editor
+[ ] Ability to delete posts
+[ ] Locking mechanism to prevent writing overlaps from multiple posts
+[ ] Word filtering based on blacklist in config
+[ ] File uploader
+[ ] Configuration file additions
+    [ ] Ability to set timezone (overall, even for displaying existing thread times; maybe times should be saved in UTC?)
+    [ ] Ability to enable/disable anti-bot verification
+    [ ] Ability to enable/disable file uploader
+    [ ] Ability to enable/disable anti-bot verification answer case sensitivity
+    [ ] Option to either censor or throw error upon detecting filtered word
+    [ ] Option to throw misleading error upon detecting filtered word
+    [ ] Option to specify maximum number of replies for a thread
+    [ ] Option to specify maximum length for comment
+[ ] Post preview
+[ ] Tripcodes for names
 
-- Elements
-    - Index page
-        - Posting form
-            - Name (with tripcode system?)
-            - Email
-            - Topic
-            - Comment
-            - Password (for post deletion)
-            - Verification
-            - File upload (way later pls)
-            - Post preview
-- Lock indicator to indicate another post is processing and for the script to wait
+
+[ ] Run through freshly-initialized server & test everything
 
 
-Look at some JP site BBS or something
-
-
-
-
+- NOTES ------------------------------------------------------------------------
 milkbbs
 milkbbs?page=thread&id=3
 milkbbs?page=admin
