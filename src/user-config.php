@@ -11,7 +11,8 @@ return [
         'jpg',
         'zip'
     ],
-    'hideSoftwareStamp' => true, // "Running milkBBS ver 1.32"
+    'hideSoftwareStamp' => false, // "Running milkBBS ver 1.32"
+    'hideAdminPanelLink' => false,
     'limits' => [
         'name' => 64,
         'email' => 256,
@@ -22,6 +23,8 @@ return [
         'fileNameLength' => 64,
         'fileSize' => 1048576
     ],
+    'reportingEnabled' => true, // Reporting bad posts, not metrics
+    'navigationPageLimit' => 5,
     'threadsPerPageLimit' => 3,
     'threadPreviewPostLimit' => 3,
     'threadReplyLimit' => 256,

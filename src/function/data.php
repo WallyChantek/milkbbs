@@ -23,7 +23,7 @@ $data['file']['toc'] = $fsLib . 'db/toc.json';
 $data['file']['postCount'] = $fsLib . 'db/postcounter.txt';
 
 // HTML Templates
-$data['postTemplate'] =
+$data['template']['post'] =
     '<div class="milkbbs-entry" id="{POST_ID}">'
   .     '<div>'
   .         '<div class="milkbbs-post-name"><a href="mailto:{POST_EMAIL}">{POST_AUTHOR}</a>&nbsp;<a class="milkbbs-post-url" href="{POST_URL}">[URL]</a></div>'
@@ -37,9 +37,21 @@ $data['postTemplate'] =
   .     '</div>'
   .     '<div>'
   .         '<div class="milkbbs-post-date">{POST_DATE}</div>'
-  .         '<div class="milkbbs-post-delete">{POST_DELETE}</div>'
+  .         '<div>'
+  .             '<span class="milkbbs-post-report">{POST_REPORT}</span>&nbsp;'
+  .             '<span class="milkbbs-post-delete">{POST_DELETE}</span>'
+  .         '</div>'
   .     '</div>'
   . '</div>'
+;
+
+$data['template']['footer'] =
+    '<div class="milkbbs-footer">'
+        . '<div class="milkbbs-footer-pages">[<] [1] [2] [3] [>]</div>'
+        . '<div class="milkbbs-footer-info">[Admin]</div>'
+        . '<div class="milkbbs-footer-info">Running milkBBS v0.54</div>'
+    . '</div>'
+
 ;
 
 return $data;

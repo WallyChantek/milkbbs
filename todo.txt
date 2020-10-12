@@ -1,32 +1,38 @@
 - TODO -------------------------------------------------------------------------
-[/] Server-side post data validation
-    [x] Field lengths
-    [x] Field types (e-mail, url, etc.)
-    [ ] Text encoding? Maybe everything is received at unicode?
-    [ ] Files
 [x] Anti-bot verification
     [x] User-defined questions
     [x] Main functionality
 [x] Ensure HTML in comments isn't parsed
-[ ] Build out footer (with page numbers and such)
+[/] Build out footer (with page numbers and such)
 [/] Index page pagination
+[ ] Evaluate names of user configuration keys, try to find a good pattern
 [ ] Go through and ensure all data loading/checking stuff is actually consistent
-    - Like, arrays are checked to be arrays and ensured they have a minimum
-      count, etc.
-[ ] Formatting codes with simple editor
+    --- Like, arrays are checked to be arrays and ensured they have a minimum
+        count, etc.
 [ ] Ability to delete posts
-[ ] Locking mechanism to prevent writing overlaps from multiple posts
 [ ] Word filtering based on blacklist in config
-[ ] File uploader
+    --- Option to either censor or throw error, or throw misleading error upon
+        detecting filtered word
+[ ] Administrative control panel
+[ ] Ability to report posts (reported posts show up in admin panel)
+[/] Server-side post data validation
+    [x] Field lengths
+    [x] Field types (e-mail, url, etc.)
+    [ ] Text encoding? Maybe everything is received in unicode?
+    [ ] Files
 [ ] Line breaks in comments
+[ ] Locking mechanism to prevent writing overlaps from multiple posts
+[ ] Formatting codes with simple editor
+    --- Add ability to respond to posts a 2ch's ">>" (also implement quoting
+        via ">");
+[ ] File uploader
 [/] Configuration file additions
     [x] Ability to enable/disable anti-bot verification
     [x] Ability to enable/disable anti-bot verification answer case sensitivity
     [x] Option to specify maximum length for fields
-    [/] Ability to set timezone (overall, even for displaying existing thread times; maybe times should be saved in UTC?)
+    [/] Ability to set timezone (overall, even for displaying existing thread
+        times; in tandem with this, change time in database to UTC)
     [/] Ability to enable/disable file uploader
-    [/] Option to either censor or throw error upon detecting filtered word
-    [/] Option to throw misleading error upon detecting filtered word
     [/] Option to specify maximum number of replies for a thread
 [ ] Post preview
 [ ] Tripcodes for names

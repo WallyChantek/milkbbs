@@ -29,8 +29,10 @@ function loadMilkBBS()
 */
 function insertIndexPage($cfg)
 {
+    $html = '<div class="milkbbs">';
+    
     // Get form for making a new post.
-    $html = getPostForm($cfg);
+    $html .= getPostForm($cfg);
     
     // Get the threads.
     if (file_exists($cfg['file']['toc']))
@@ -69,6 +71,10 @@ function insertIndexPage($cfg)
         }
     }
     
+    $html .= getFooter($cfg);
+    
+    $html .= '</div>';
+    
     echo $html;
 }
 
@@ -79,8 +85,10 @@ function insertThreadPage($cfg)
 {
     $threadId = $_GET['id'];
     
+    $html = '<div class="milkbbs">';
+    
     // Get form for replying to an existing thread.
-    $html = getPostForm($cfg, $threadId);
+    $html .= getPostForm($cfg, $threadId);
     
     // Get the thread.
     if (file_exists($cfg['path']['threads'] . "$threadId.json"))
@@ -97,6 +105,10 @@ function insertThreadPage($cfg)
         displayError($cfg, 'This thread could not be displayed due to errors.', true);
     }
     
+    $html .= getFooter($cfg);
+    
+    $html .= '</div>';
+    
     echo $html;
 }
 
@@ -105,8 +117,11 @@ function insertThreadPage($cfg)
 */
 function insertAdminPage($cfg)
 {
-    $html = '';
+    $html = '<div class="milkbbs">';
+    
     $html .= '<p>Admin page!</p>';
+    
+    $html .= '</div>';
     
     echo $html;
 }
@@ -187,7 +202,7 @@ function getThread($cfg, $threadData, $showAllReplies = true)
     {
         $p = $threadData[$i];
         
-        $html .= $cfg['postTemplate'];
+        $html .= $cfg['template']['post'];
         
         if (!isset($p['email']))
         {
@@ -217,6 +232,7 @@ function getThread($cfg, $threadData, $showAllReplies = true)
         $html = str_replace('{POST_COMMENT}', $p['comment'], $html);
         $html = str_replace('{POST_DATE}', $p['date'], $html);
         $html = str_replace('{POST_DELETE}', '[Delete]', $html);
+        $html = str_replace('{POST_REPORT}', '[Report]', $html);
         $html = str_replace('{POST_ANCHOR_LINK}', $cfg['path']['originFile'] . '?page=thread&id=' . $threadId . '#' . $p['id'], $html);
     }
     
@@ -231,6 +247,16 @@ function getThread($cfg, $threadData, $showAllReplies = true)
     {
         $html .= '<hr class="milkbbs-hr">';
     }
+    
+    return $html;
+}
+
+/*
+    Generates a footer with the page list and other things.
+*/
+function getFooter($cfg)
+{
+    $html .= $cfg['template']['footer'];
     
     return $html;
 }
