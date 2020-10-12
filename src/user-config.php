@@ -3,7 +3,7 @@
 return [
     'addHrAfterThreads' => true,
     'allowEmptyComments' => true,
-    'antiBotEnabled' => false,
+    'antiBotEnabled' => true,
     'antiBotCaseSensitive' => false,
     'fileUploadsEnabled' => false,
     'filetypeMode' => 'blacklist', // blacklist or whitelist
@@ -11,6 +11,7 @@ return [
         'jpg',
         'zip'
     ],
+    'hideSoftwareStamp' => true, // "Running milkBBS ver 1.32"
     'limits' => [
         'name' => 64,
         'email' => 256,
@@ -21,6 +22,7 @@ return [
         'fileNameLength' => 64,
         'fileSize' => 1048576
     ],
+    'threadsPerPageLimit' => 3,
     'threadPreviewPostLimit' => 3,
     'threadReplyLimit' => 256,
     'timezone' => 'America/New_York',

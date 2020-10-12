@@ -1,6 +1,6 @@
 <?php
 
-$cfg = require_once(dirname(__FILE__) . '/../config.php');
+$cfg = require_once(dirname(__FILE__) . '/../user-config.php');
 $cfg = array_merge($cfg, require_once('data.php'));
 
 date_default_timezone_set('America/New_York');
@@ -73,6 +73,14 @@ function validatePostData($cfg)
         {
             displayError($cfg, 'Homepage URL cannot exceed (' . $limits['url'] . ') characters.');
         }
+        
+        if (
+            stripos($postData['url'], 'http://') !== 0 &&
+            stripos($postData['url'], 'https://') !== 0
+        )
+        {
+            displayError($cfg, 'Homepage URL must specify the protocol (http:// or https://). Please ensure your URL begins with one of these.');
+        }
     }
     
     // Validate subject.
@@ -130,7 +138,12 @@ function validatePostData($cfg)
         }
         
         // Check answer
-        $questions = require_once(dirname(__FILE__) . '/../verification-questions.php');
+        $questions = require_once(dirname(__FILE__) . '/../user-verification-questions.php');
+        if (!is_array($questions) || count($questions) === 0)
+        {
+            displayError($cfg, 'Could not load server-side verification data.', true);
+        }
+        
         $userAnswer = trim($_POST['verification-answer']);
         $realAnswer = $questions[$_POST['verification-question-id']][1];
         

@@ -5,7 +5,7 @@ namespace milkbbs;
 function loadMilkBBS()
 {
     // Load user and system configuration.
-    $cfg = require_once(dirname(__FILE__) . '/../config.php');
+    $cfg = require_once(dirname(__FILE__) . '/../user-config.php');
     $cfg = array_merge($cfg, require_once('data.php'));
     
     // Generate page based on URL's GET data.
@@ -41,8 +41,11 @@ function insertIndexPage($cfg)
             displayError($cfg, 'Corrupted table of contents.', true);
         }
         
-        foreach ($toc as $threadId)
+        $displayLimit = (isset($cfg['threadsPerPageLimit']) && is_numeric($cfg['threadsPerPageLimit'])) ? $cfg['threadsPerPageLimit'] : count($toc);
+        
+        for ($i = 0; $i < $displayLimit; $i++)
         {
+            $threadId = $toc[$i];
             $threadData = '';
             
             if (file_exists($cfg['path']['threads'] . "$threadId.json"))
@@ -114,13 +117,27 @@ function insertAdminPage($cfg)
 */
 function getPostForm($cfg, $threadId = '')
 {
-    if ($cfg['antiBotEnabled'])
+    // Load verification question (if enabled).
+    if (isset($cfg['antiBotEnabled']) && $cfg['antiBotEnabled'])
     {
-        $questions = require_once(dirname(__FILE__) . '/../verification-questions.php');
-        $qid = array_rand($questions);
-        $q = $questions[$qid][0];
+        $questions = require_once(dirname(__FILE__) . '/../user-verification-questions.php');
+        
+        if (is_array($questions) && count($questions) > 0)
+        {
+            $qid = array_rand($questions);
+            
+            if (isset($questions[$qid][1]))
+            {
+                $q = $questions[$qid][0];
+            }
+            else
+            {
+                displayError($cfg, 'Something went wrong loading the anti-bot verification.', true);
+            }
+        }
     }
     
+    // Build out form.
     $html = '<form method="post" action="' . $cfg['path']['webLib'] . 'function/process-post.php">'
           . '<table class="milkbbs-posting-form">'
           . '<tr><td>Name</td><td><input name="name" type="text" placeholder="Anonymous"></td>'
@@ -139,6 +156,7 @@ function getPostForm($cfg, $threadId = '')
           . '</form>'
     ;
     
+    // Insert verification question (if enabled).
     if (isset($qid))
     {
         $v = '<tr><td colspan="2">' . $q . '<input name="verification-question-id" type="hidden" value="' . $qid . '"></td></tr>'

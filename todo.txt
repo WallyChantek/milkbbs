@@ -1,13 +1,18 @@
 - TODO -------------------------------------------------------------------------
 [/] Server-side post data validation
     [x] Field lengths
-    [ ] Field types (e-mail, url, etc.)
+    [x] Field types (e-mail, url, etc.)
+    [ ] Text encoding? Maybe everything is received at unicode?
     [ ] Files
 [x] Anti-bot verification
     [x] User-defined questions
     [x] Main functionality
 [x] Ensure HTML in comments isn't parsed
-[ ] Index page pagination
+[ ] Build out footer (with page numbers and such)
+[/] Index page pagination
+[ ] Go through and ensure all data loading/checking stuff is actually consistent
+    - Like, arrays are checked to be arrays and ensured they have a minimum
+      count, etc.
 [ ] Formatting codes with simple editor
 [ ] Ability to delete posts
 [ ] Locking mechanism to prevent writing overlaps from multiple posts
