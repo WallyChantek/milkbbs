@@ -1,6 +1,7 @@
 - TODO -------------------------------------------------------------------------
 [/] Server-side post data validation
-    [x] Basic fields
+    [x] Field lengths
+    [ ] Field types (e-mail, url, etc.)
     [ ] Files
 [x] Anti-bot verification
     [x] User-defined questions
@@ -12,15 +13,16 @@
 [ ] Locking mechanism to prevent writing overlaps from multiple posts
 [ ] Word filtering based on blacklist in config
 [ ] File uploader
-[ ] Configuration file additions
-    [ ] Ability to set timezone (overall, even for displaying existing thread times; maybe times should be saved in UTC?)
-    [ ] Ability to enable/disable anti-bot verification
-    [ ] Ability to enable/disable file uploader
-    [ ] Ability to enable/disable anti-bot verification answer case sensitivity
-    [ ] Option to either censor or throw error upon detecting filtered word
-    [ ] Option to throw misleading error upon detecting filtered word
-    [ ] Option to specify maximum number of replies for a thread
-    [ ] Option to specify maximum length for comment
+[ ] Line breaks in comments
+[/] Configuration file additions
+    [x] Ability to enable/disable anti-bot verification
+    [x] Ability to enable/disable anti-bot verification answer case sensitivity
+    [x] Option to specify maximum length for fields
+    [/] Ability to set timezone (overall, even for displaying existing thread times; maybe times should be saved in UTC?)
+    [/] Ability to enable/disable file uploader
+    [/] Option to either censor or throw error upon detecting filtered word
+    [/] Option to throw misleading error upon detecting filtered word
+    [/] Option to specify maximum number of replies for a thread
 [ ] Post preview
 [ ] Tripcodes for names
 
