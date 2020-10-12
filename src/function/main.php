@@ -43,7 +43,7 @@ function insertIndexPage($cfg)
             displayError($cfg, 'Corrupted table of contents.', true);
         }
         
-        $displayLimit = (isset($cfg['threadsPerPageLimit']) && is_numeric($cfg['threadsPerPageLimit'])) ? $cfg['threadsPerPageLimit'] : count($toc);
+        $displayLimit = (isset($cfg['threadsPerPageLimit']) && is_numeric($cfg['threadsPerPageLimit'])) ? min($cfg['threadsPerPageLimit'], count($toc)) : count($toc);
         
         for ($i = 0; $i < $displayLimit; $i++)
         {
