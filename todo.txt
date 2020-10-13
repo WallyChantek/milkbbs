@@ -3,12 +3,14 @@
     [x] User-defined questions
     [x] Main functionality
 [x] Ensure HTML in comments isn't parsed
-[/] Build out footer (with page numbers and such)
-[/] Index page pagination
-[ ] Evaluate names of user configuration keys, try to find a good pattern
-[ ] Go through and ensure all data loading/checking stuff is actually consistent
+[x] Evaluate names of user configuration keys, try to find a good pattern
+[x] Go through and ensure all data loading/checking stuff is actually consistent
     --- Like, arrays are checked to be arrays and ensured they have a minimum
         count, etc.
+[x] Build out footer (with page numbers and such)
+[x] Index page pagination
+[ ] Consider current GET parameters setup
+[ ] Rename keys for posts in DB (name -> author)
 [ ] Ability to delete posts
 [ ] Word filtering based on blacklist in config
     --- Option to either censor or throw error, or throw misleading error upon
@@ -36,6 +38,8 @@
     [/] Option to specify maximum number of replies for a thread
 [ ] Post preview
 [ ] Tripcodes for names
+[ ] More secure bot check (like some sort of token)?
+[ ] Validate user configuration data
 
 
 [ ] Run through freshly-initialized server & test everything

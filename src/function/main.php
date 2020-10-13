@@ -2,24 +2,32 @@
 
 namespace milkbbs;
 
+error_reporting(E_ALL);
+
 function loadMilkBBS()
 {
-    // Load user and system configuration.
+    // Load common functions
+    require_once('common-functions.php');
+    
+    // Load and validate user configuration.
     $cfg = require_once(dirname(__FILE__) . '/../user-config.php');
+    $cfg = validateUserData($cfg);
+    
+    // Load system configuration
     $cfg = array_merge($cfg, require_once('data.php'));
     
     // Generate page based on URL's GET data.
-    if ($_GET['page'] === 'thread')
+    $requestedPage = isset($_GET['page']) ? $_GET['page'] : '';
+    switch ($requestedPage)
     {
-        insertThreadPage($cfg);
-    }
-    else if ($_GET['page'] === 'admin')
-    {
-        insertAdminPage($cfg);
-    }
-    else
-    {
-        insertIndexPage($cfg);
+        case 'thread':
+            insertThreadPage($cfg);
+            break;
+        case 'admin':
+            insertAdinPage($cfg);
+            break;
+        default:
+            insertIndexPage($cfg);
     }
 }
 
@@ -35,6 +43,8 @@ function insertIndexPage($cfg)
     $html .= getPostForm($cfg);
     
     // Get the threads.
+    $totalNumberOfPages = 0;
+    $pageNum = 1;
     if (file_exists($cfg['file']['toc']))
     {
         $toc = json_decode(file_get_contents($cfg['file']['toc']));
@@ -43,9 +53,22 @@ function insertIndexPage($cfg)
             displayError($cfg, 'Corrupted table of contents.', true);
         }
         
-        $displayLimit = (isset($cfg['threadsPerPageLimit']) && is_numeric($cfg['threadsPerPageLimit'])) ? min($cfg['threadsPerPageLimit'], count($toc)) : count($toc);
+        $pageNum = (isset($_GET['pageNum']) && is_numeric($_GET['pageNum'])) ? intval($_GET['pageNum']) : 1;
         
-        for ($i = 0; $i < $displayLimit; $i++)
+        $totalThreadsPerPage = $cfg['maxThreadsPerPage'] > 0 ? min($cfg['maxThreadsPerPage'], count($toc)) : count($toc);
+        
+        $totalNumberOfPages = ceil(count($toc) / $totalThreadsPerPage);
+        
+        if ($pageNum < 1)
+        {
+            $pageNum = 1;
+        }
+        elseif ($pageNum > $totalNumberOfPages)
+        {
+            $pageNum = $totalNumberOfPages;
+        }
+        
+        for ($i = (($pageNum - 1) * $totalThreadsPerPage); $i < min(($totalThreadsPerPage * $pageNum), count($toc)); $i++)
         {
             $threadId = $toc[$i];
             $threadData = '';
@@ -71,7 +94,8 @@ function insertIndexPage($cfg)
         }
     }
     
-    $html .= getFooter($cfg);
+    // Get the footer
+    $html .= getFooter($cfg, $totalNumberOfPages, $pageNum);
     
     $html .= '</div>';
     
@@ -83,7 +107,12 @@ function insertIndexPage($cfg)
 */
 function insertThreadPage($cfg)
 {
-    $threadId = $_GET['id'];
+    $threadId = (isset($_GET['id']) && is_numeric($_GET['id'])) ? intval($_GET['id']) : 0;
+    
+    if ($threadId === 0)
+    {
+        displayError($cfg, 'Could not display thread, possibly due to bad thread ID. This thread may not exist.', true);
+    }
     
     $html = '<div class="milkbbs">';
     
@@ -133,7 +162,7 @@ function insertAdminPage($cfg)
 function getPostForm($cfg, $threadId = '')
 {
     // Load verification question (if enabled).
-    if (isset($cfg['antiBotEnabled']) && $cfg['antiBotEnabled'])
+    if ($cfg['antiBotVerificationEnabled'])
     {
         $questions = require_once(dirname(__FILE__) . '/../user-verification-questions.php');
         
@@ -141,7 +170,7 @@ function getPostForm($cfg, $threadId = '')
         {
             $qid = array_rand($questions);
             
-            if (isset($questions[$qid][1]))
+            if (isset($questions[$qid][0]) && isset($questions[$qid][1]))
             {
                 $q = $questions[$qid][0];
             }
@@ -153,37 +182,21 @@ function getPostForm($cfg, $threadId = '')
     }
     
     // Build out form.
-    $html = '<form method="post" action="' . $cfg['path']['webLib'] . 'function/process-post.php">'
-          . '<table class="milkbbs-posting-form">'
-          . '<tr><td>Name</td><td><input name="name" type="text" placeholder="Anonymous"></td>'
-          . '<tr><td>Email</td><td><input name="email" type="text"></td>'
-          . '<tr><td>Homepage</td><td><input name="url" type="text"></td>'
-          . '<tr><td>Subject</td><td><input name="subject" type="text"></td>'
-          . '<tr><td>Comment</td><td><textarea name="comment"></textarea></td>'
-          . '<tr><td>Password</td><td><input name="password" type="text" placeholder="(optional, for post deletion)"></td>'
-          . '{VERIFICATION}'
-          . '<tr><td colspan="2">'
-          .     '<input name="threadId" type="hidden" value="' . $threadId . '">'
-          .     '<input name="callingScript" type="hidden" value="' . $cfg['path']['originFile'] . '">'
-          .     '<input type="submit">'
-          . '</td></tr>'
-          . '</table>'
-          . '</form>'
-    ;
+    $html = $cfg['template']['form'];
+    $html = str_replace('{PROCESSING_SCRIPT}', $cfg['path']['webLib'] . 'function/process-post.php', $html);
+    $html = str_replace('{PARENT_THREAD_ID}', $threadId, $html);
+    $html = str_replace('{ORIGIN_FILE}', $cfg['file']['originFile'], $html);
     
     // Insert verification question (if enabled).
+    $verification = '';
     if (isset($qid))
     {
-        $v = '<tr><td colspan="2">' . $q . '<input name="verification-question-id" type="hidden" value="' . $qid . '"></td></tr>'
-           . '<tr><td colspan="2"><input name="verification-answer" type="text"></td>'
+        $verification =
+            '<tr><td colspan="2">' . $q . '<input name="verification-question-id" type="hidden" value="' . $qid . '"></td></tr>'
+          . '<tr><td colspan="2"><input name="verification-answer" type="text"></td>'
         ;
-        
-        $html = str_replace('{VERIFICATION}', $v, $html);
     }
-    else
-    {
-        $html = str_replace('{VERIFICATION}', '', $html);
-    }
+    $html = str_replace('{VERIFICATION}', $verification, $html);
     
     return $html;
 }
@@ -193,25 +206,53 @@ function getPostForm($cfg, $threadId = '')
 */
 function getThread($cfg, $threadData, $showAllReplies = true)
 {
-    $displayLimit = ($showAllReplies ? count($threadData) : min($cfg['threadPreviewPostLimit'], count($threadData)));
+    $numberOfDisplayedPosts = $showAllReplies ? count($threadData) : min($cfg['maxPostsPerThreadPreview'], count($threadData));
     $threadId = $threadData[0]['id'];
     
     $html = '<div class="milkbbs-thread-container">';
     
-    for ($i = 0; $i < $displayLimit; $i++)
+    // Generate each post for the thread
+    for ($i = 0; $i < $numberOfDisplayedPosts; $i++)
     {
+        // Retrieve and validate post data
         $p = $threadData[$i];
+        $p['id'] = (isset($p['id']) && is_numeric($p['id']) && $p['id'] > 0) ? $p['id'] : 0;
+        $p['name'] = isset($p['name']) ? $p['name'] : '';
+        $p['email'] = isset($p['email']) ? $p['email'] : '';
+        $p['url'] = isset($p['url']) ? $p['url'] : '';
+        $p['subject'] = isset($p['subject']) ? $p['subject'] : '';
+        $p['comment'] = isset($p['comment']) ? $p['comment'] : '';
+        $p['date'] = isset($p['date']) ? $p['date'] : '';
         
-        $html .= $cfg['template']['post'];
-        
-        if (!isset($p['email']))
+        // Render this thread as bad if certain data was bad or missing.
+        if (
+            $p['id'] === 0
+         || $p['name'] === ''
+         || $p['date'] === ''
+        )
         {
-            $html = str_replace('<a href="mailto:{POST_EMAIL}">{POST_AUTHOR}</a>', '{POST_AUTHOR}', $html);
+            $html .= '<div class="milkbbs-thread-container">'
+                   . '<div class="milkbbs-entry">'
+                   . "<div>Post number ($threadId) could not be displayed due to errors.</div>"
+                   . '</div>'
+                   . '</div>'
+            ;
+            
+            continue;
         }
         
-        if (!isset($p['url']))
+        // Retrieve post template.
+        $html .= $cfg['template']['post'];
+        
+        // Remove tags for unnecessary fields
+        if ($p['email'] === '')
         {
-            $html = str_replace('&nbsp;<a class="milkbbs-post-url" href="{POST_URL}">[URL]</a>', '', $html);
+            $html = str_replace('<a href="mailto:{EMAIL}">{AUTHOR}</a>', '{AUTHOR}', $html);
+        }
+        
+        if ($p['url'] === '')
+        {
+            $html = str_replace('&nbsp;<a class="milkbbs-post-url" href="{URL}">[URL]</a>', '', $html);
         }
         
         // Escape HTML characters in strings so they aren't parsed.
@@ -225,28 +266,25 @@ function getThread($cfg, $threadData, $showAllReplies = true)
         
         // Replace template tags with post data.
         $html = str_replace('{POST_ID}', $p['id'], $html);
-        $html = str_replace('{POST_AUTHOR}', $p['name'], $html);
-        $html = str_replace('{POST_EMAIL}', $p['email'], $html);
-        $html = str_replace('{POST_URL}', $p['url'], $html);
-        $html = str_replace('{POST_SUBJECT}', $p['subject'], $html);
-        $html = str_replace('{POST_COMMENT}', $p['comment'], $html);
-        $html = str_replace('{POST_DATE}', $p['date'], $html);
-        $html = str_replace('{POST_DELETE}', '[Delete]', $html);
-        $html = str_replace('{POST_REPORT}', '[Report]', $html);
-        $html = str_replace('{POST_ANCHOR_LINK}', $cfg['path']['originFile'] . '?page=thread&id=' . $threadId . '#' . $p['id'], $html);
+        $html = str_replace('{AUTHOR}', $p['name'], $html);
+        $html = str_replace('{EMAIL}', $p['email'], $html);
+        $html = str_replace('{URL}', $p['url'], $html);
+        $html = str_replace('{SUBJECT}', $p['subject'], $html);
+        $html = str_replace('{COMMENT}', $p['comment'], $html);
+        $html = str_replace('{DATE}', $p['date'], $html);
+        $html = str_replace('{DELETE}', '[Delete]', $html);
+        $html = str_replace('{REPORT}', '[Report]', $html);
+        $html = str_replace('{ANCHOR}', $cfg['file']['originFile'] . '?page=thread&id=' . $threadId . '#' . $p['id'], $html);
     }
     
+    // Add reply button if thread is truncated.
     if (!$showAllReplies)
     {
-        $html .= '<div class="milkbbs-entry milkbbs-reply"><div><a class="milkbbs-reply" href="' . $cfg['path']['originFile'] . '?page=thread&id=' . $threadId . '">[Reply to this thread...]</a></div></div>';
+        $html .= '<div class="milkbbs-entry milkbbs-reply"><div><a class="milkbbs-reply" href="' . $cfg['file']['originFile'] . '?page=thread&id=' . $threadId . '">[Reply to this thread...]</a></div></div>';
     }
     
     $html .= '</div>';
-    
-    if (!$showAllReplies && $cfg['addHrAfterThreads'])
-    {
-        $html .= '<hr class="milkbbs-hr">';
-    }
+    $html .= '<hr class="milkbbs-hr">';
     
     return $html;
 }
@@ -254,9 +292,83 @@ function getThread($cfg, $threadData, $showAllReplies = true)
 /*
     Generates a footer with the page list and other things.
 */
-function getFooter($cfg)
+function getFooter($cfg, $totalNumberOfPages = 0, $pageNum = 1)
 {
-    $html .= $cfg['template']['footer'];
+    $html = $cfg['template']['footer'];
+    
+    // Page navigation
+    if ($totalNumberOfPages > 0)
+    {
+        $n = ' ';
+        
+        // Find display ranges if constrained via configuration.
+        $rLower = 1;
+        $rUpper = $totalNumberOfPages;
+        $maxNavLinks = $cfg['maxNavigationPageLinks'];
+        if ($cfg['maxNavigationPageLinks'] > 0)
+        {
+            // Lower
+            $f = floor($maxNavLinks / 2);
+
+            $rLower = $pageNum - $f;
+            $rUpper = $pageNum + $f;
+            
+            // If max links is even we have to make a correction.
+            if ($maxNavLinks % 2 === 0)
+            {
+                $rLower++;
+            }
+            
+            // Shift right if we hit the left side.
+            while ($rLower < 1)
+            {
+                $rLower++;
+                $rUpper++;
+            }
+            
+            // Shift left if we hit the right side.
+            while ($rUpper > $totalNumberOfPages)
+            {
+                $rLower--;
+                $rUpper--;
+            }
+        }
+        
+        $rLower = intval($rLower);
+        $rUpper = intval($rUpper);
+        
+        // Build out page navigation links.
+        for ($i = $rLower; $i <= $rUpper; $i++)
+        {
+            if ($i !== $pageNum)
+            {
+                $n .= '<a href="?pageNum=' . $i . '">[' . $i . ']</a> ';
+            }
+            else
+            {
+                $n .= '[' . $i . '] ';
+            }
+        }
+        $html = str_replace('{PAGES}', $n, $html);
+        
+        // Set hrefs for next/previous page buttons.
+        if ($totalNumberOfPages > 1)
+        {
+            if ($pageNum - 1 >= 1)
+            {
+                $html = str_replace('[<]', '<a href="?pageNum='. ($pageNum - 1) .'">[<]</a>', $html);
+            }
+            
+            if ($pageNum + 1 <= $totalNumberOfPages)
+            {
+                $html = str_replace('[>]', '<a href="?pageNum=' . ($pageNum + 1) . '">[>]</a>', $html);
+            }
+        }
+    }
+    else
+    {
+        $html = str_replace('<div class="milkbbs-footer-pages">[<]{PAGES}[>]</div>', '', $html);
+    }
     
     return $html;
 }
@@ -267,7 +379,7 @@ function getFooter($cfg)
 function displayError($cfg, $msg = '', $offerSupport)
 {
     $html = '<div class="milkbbs-error-container">'
-           // . '<div class="milkbbs-error-logo">milkBBS</div>'
+           . '<div class="milkbbs-error-logo">milkBBS Logo</div>'
            . '<div class="milkbbs-error-title">milkBBS</div>'
            . '<div class="milkbbs-error-message">Error: ' . $msg . ($offerSupport ? ' Please contact the server administrator if this issue persists.' : '') . '</div>'
            . '</div>'
