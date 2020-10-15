@@ -217,7 +217,7 @@ function getThread($cfg, $threadData, $showAllReplies = true)
         // Retrieve and validate post data
         $p = $threadData[$i];
         $p['id'] = (isset($p['id']) && is_numeric($p['id']) && $p['id'] > 0) ? $p['id'] : 0;
-        $p['name'] = isset($p['name']) ? $p['name'] : '';
+        $p['author'] = isset($p['author']) ? $p['author'] : '';
         $p['email'] = isset($p['email']) ? $p['email'] : '';
         $p['url'] = isset($p['url']) ? $p['url'] : '';
         $p['subject'] = isset($p['subject']) ? $p['subject'] : '';
@@ -227,7 +227,7 @@ function getThread($cfg, $threadData, $showAllReplies = true)
         // Render this thread as bad if certain data was bad or missing.
         if (
             $p['id'] === 0
-         || $p['name'] === ''
+         || $p['author'] === ''
          || $p['date'] === ''
         )
         {
@@ -266,7 +266,7 @@ function getThread($cfg, $threadData, $showAllReplies = true)
         
         // Replace template tags with post data.
         $html = str_replace('{POST_ID}', $p['id'], $html);
-        $html = str_replace('{AUTHOR}', $p['name'], $html);
+        $html = str_replace('{AUTHOR}', $p['author'], $html);
         $html = str_replace('{EMAIL}', $p['email'], $html);
         $html = str_replace('{URL}', $p['url'], $html);
         $html = str_replace('{SUBJECT}', $p['subject'], $html);

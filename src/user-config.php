@@ -16,7 +16,7 @@ return [
     'maxFileSizeInBytes' => 1048576,
     
     // Max field character lengths
-    'maxNameFieldLength' => 64,
+    'maxAuthorFieldLength' => 64,
     'maxEmailFieldLength' => 256,
     'maxUrlFieldLength' => 256,
     'maxSubjectFieldLength' => 72,
@@ -32,6 +32,7 @@ return [
     'timezone' => 'America/New_York',
     
     // Board functionality
+    'postDeletingEnabled' => true,
     'postReportingEnabled' => true, // Reporting bad posts, not metrics
     'maxRepliesPerThread' => 256,
     

@@ -35,19 +35,26 @@ else
 function validatePostData($cfg)
 {
     $maxFieldLengths = [
-        'name' => (is_numeric($cfg['maxNameFieldLength']) ? $cfg['maxNameFieldLength'] : 64),
-        'email' => (is_numeric($cfg['maxEmailFieldLength']) ? $cfg['maxEmailFieldLength'] : 256),
-        'url' => (is_numeric($cfg['maxUrlFieldLength']) ? $cfg['maxUrlFieldLength'] : 256),
-        'subject' => (is_numeric($cfg['maxSubjectFieldLength']) ? $cfg['maxSubjectFieldLength'] : 72),
-        'comment' => (is_numeric($cfg['maxCommentFieldLength']) ? $cfg['maxCommentFieldLength'] : 2048),
-        'password' => (is_numeric($cfg['maxPasswordFieldLength']) ? $cfg['maxPasswordFieldLength'] : 32),
+        'author' => (isset($cfg['maxAuthorFieldLength']) ? $cfg['maxAuthorFieldLength'] : 64),
+        'email' => (isset($cfg['maxEmailFieldLength']) ? $cfg['maxEmailFieldLength'] : 256),
+        'url' => (isset($cfg['maxUrlFieldLength']) ? $cfg['maxUrlFieldLength'] : 256),
+        'subject' => (isset($cfg['maxSubjectFieldLength']) ? $cfg['maxSubjectFieldLength'] : 72),
+        'comment' => (isset($cfg['maxCommentFieldLength']) ? $cfg['maxCommentFieldLength'] : 2048),
+        'password' => (isset($cfg['maxPasswordFieldLength']) ? $cfg['maxPasswordFieldLength'] : 32),
         // 'maxFilenameLength' => (is_numeric($cfg['maxFileNameLength']) ? $cfg['maxFileNameLength'] : 64),
         // 'maxFileSize' => (is_numeric($cfg['maxFileSizeInBytes']) ? $cfg['maxFileSizeInBytes'] : 1048576)
     ];
     
+    $maxFieldLengths['author'] = (is_numeric($maxFieldLengths['author']) && $maxFieldLengths['author'] > 0) ? $maxFieldLengths['author'] : 64;
+    $maxFieldLengths['email'] = (is_numeric($maxFieldLengths['email']) && $maxFieldLengths['email'] > 0) ? $maxFieldLengths['email'] : 64;
+    $maxFieldLengths['url'] = (is_numeric($maxFieldLengths['url']) && $maxFieldLengths['url'] > 0) ? $maxFieldLengths['url'] : 64;
+    $maxFieldLengths['subject'] = (is_numeric($maxFieldLengths['subject']) && $maxFieldLengths['subject'] > 0) ? $maxFieldLengths['subject'] : 64;
+    $maxFieldLengths['comment'] = (is_numeric($maxFieldLengths['comment']) && $maxFieldLengths['comment'] > 0) ? $maxFieldLengths['comment'] : 64;
+    $maxFieldLengths['password'] = (is_numeric($maxFieldLengths['password']) && $maxFieldLengths['password'] > 0) ? $maxFieldLengths['password'] : 64;
+    
     $postData = [];
     $postData['date'] = date('Y-m-d (D) H:i:s');
-    $postData['name'] = (isset($_POST['name']) && strlen($_POST['name']) > 0) ? $_POST['name'] : 'Anonymous';
+    $postData['author'] = (isset($_POST['author']) && strlen($_POST['author']) > 0) ? $_POST['author'] : 'Anonymous';
     $postData['email'] = isset($_POST['email']) ? $_POST['email'] : '';
     $postData['url'] = isset($_POST['url']) ? $_POST['url'] : '';
     $postData['subject'] = isset($_POST['subject']) ? $_POST['subject'] : '';
@@ -55,9 +62,9 @@ function validatePostData($cfg)
     $postData['password'] = isset($_POST['password']) ? $_POST['password'] : '';
     
     // Validate author name.
-    if (strlen($postData['name']) > $maxFieldLengths['name'])
+    if (strlen($postData['author']) > $maxFieldLengths['author'])
     {
-        displayError($cfg, 'Author name cannot exceed (' . $maxFieldLengths['name'] . ') characters.');
+        displayError($cfg, 'Author name cannot exceed (' . $maxFieldLengths['author'] . ') characters.');
     }
     
     // Validate e-mail.

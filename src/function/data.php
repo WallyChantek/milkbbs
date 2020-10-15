@@ -27,7 +27,7 @@ $data['file']['postCount'] = $fsLib . 'db/postcounter.txt';
 $data['template']['form'] =
     '<form method="post" action="{PROCESSING_SCRIPT}">'
   . '<table class="milkbbs-posting-form">'
-  . '<tr><td>Name</td><td><input name="name" type="text" placeholder="Anonymous"></td>'
+  . '<tr><td>Name</td><td><input name="author" type="text" placeholder="Anonymous"></td>'
   . '<tr><td>Email</td><td><input name="email" type="text"></td>'
   . '<tr><td>Homepage</td><td><input name="url" type="text"></td>'
   . '<tr><td>Subject</td><td><input name="subject" type="text"></td>'

@@ -9,8 +9,7 @@
         count, etc.
 [x] Build out footer (with page numbers and such)
 [x] Index page pagination
-[ ] Consider current GET parameters setup
-[ ] Rename keys for posts in DB (name -> author)
+[x] Rename keys for posts in DB (name -> author)
 [ ] Ability to delete posts
 [ ] Word filtering based on blacklist in config
     --- Option to either censor or throw error, or throw misleading error upon
@@ -39,7 +38,7 @@
 [ ] Post preview
 [ ] Tripcodes for names
 [ ] More secure bot check (like some sort of token)?
-[ ] Validate user configuration data
+[ ] Validate user configuration data (function is in common-functions.php)
 
 
 [ ] Run through freshly-initialized server & test everything
