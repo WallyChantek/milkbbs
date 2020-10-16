@@ -30,6 +30,25 @@
     width: 100%;
 }
 
+.milkbbs-post-management {
+    display: flex;
+    flex-direction: column;
+}
+
+.milkbbs-post-management > div:nth-child(2) {
+    display: flex;
+    justify-content: space-between;
+}
+
+.milkbbs-post-management td:nth-child(1),
+.milkbbs-post-management td:nth-child(3) {
+    text-align: right;
+}
+
+.milkbbs-post-management td:nth-child(3) input {
+    width: 100%;
+}
+
 .milkbbs-footer {
     display: flex;
     flex-direction: column;
@@ -48,6 +67,7 @@
 .milkbbs-posting-form *,
 .milkbbs-thread-container *,
 .milkbbs-error-container *,
+.milkbbs-post-management *,
 .milkbbs-footer {
     font-family: Tahoma;
     font-size: 11px;

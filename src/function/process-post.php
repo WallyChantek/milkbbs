@@ -16,9 +16,24 @@ $cfg = array_merge($cfg, require_once('data.php'));
 date_default_timezone_set($cfg['timezone']);
 
 // Only process data if a POST occurred.
-if ($_POST) {
-    $postData = validatePostData($cfg);
-    savePost($cfg, $postData);
+if ($_POST)
+{
+    if (isset($_POST['createNewPost']))
+    {
+        savePost($cfg, validatePostData($cfg));
+    }
+    else if (isset($_POST['deletePost']))
+    {
+        deletePost($cfg);
+    }
+    else if (isset($_POST['reportPost']))
+    {
+        reportPost($cfg);
+    }
+    else
+    {
+        displayError($cfg, 'No POST data provided or something else went wrong.');
+    }
     
     // Redirect to main page.
     header( 'Location: ' . $_POST['callingScript'], true, 303 );
@@ -26,7 +41,7 @@ if ($_POST) {
 }
 else
 {
-    displayError($cfg, 'No POST data provided.');
+    displayError($cfg, 'No POST data provided or something else went wrong.');
 }
 
 /*
@@ -226,7 +241,7 @@ function savePost($cfg, $post)
     {
         if (!file_exists($cfg['path']['threads'] . "$postId.json"))
         {
-            $json = json_encode(array($post), JSON_PRETTY_PRINT);
+            $json = json_encode(array($postId => $post), JSON_PRETTY_PRINT);
             if (!file_put_contents($cfg['path']['threads'] . "$postId.json", $json))
             {
                 displayError($cfg, "Could not create new thread. Something prevented it from being created in the database.", true);
@@ -242,12 +257,12 @@ function savePost($cfg, $post)
     {
         if (file_exists($cfg['path']['threads'] . $parentThreadId . '.json'))
         {
-            $threadData = json_decode(file_get_contents($cfg['path']['threads'] . $parentThreadId . '.json'));
+            $threadData = json_decode(file_get_contents($cfg['path']['threads'] . $parentThreadId . '.json'), true);
             if (!$threadData)
             {
                 displayError($cfg, "Could not retrieve data for thread number ($parentThreadId) or data is corrupted.", true);
             }
-            array_push($threadData, $post);
+            $threadData[$postId] = $post;
             $threadData = json_encode($threadData, JSON_PRETTY_PRINT);
             if (!file_put_contents($cfg['path']['threads'] . $parentThreadId . '.json', $threadData))
             {
@@ -267,7 +282,7 @@ function savePost($cfg, $post)
     {
         unset($toc[$threadPos]);
         array_unshift($toc, intval($parentThreadId));
-        array_values($toc);
+        $toc = array_values($toc);
     }
     // If thread doesn't exist in ToC, add it to the top
     else
@@ -281,6 +296,104 @@ function savePost($cfg, $post)
     {
         displayError($cfg, "Could not update the table of contents.", true);
     }
+}
+
+/*
+    Deletes a post from the database.
+*/
+function deletePost($cfg)
+{
+    // Validate data.
+    $postId = isset($_POST['postId']) ? $_POST['postId'] : 0;
+    $parentThreadId = isset($_POST['parentThreadId']) ? $_POST['parentThreadId'] : 0;
+    $password = isset($_POST['password']) ? $_POST['password'] : '';
+    
+    if (!is_numeric($postId) || $postId <= 0)
+    {
+        displayError($cfg, 'Could not delete post. Please ensure you selected a post by clicking the post\'s [Delete] button.', true);
+    }
+    
+    if (!is_numeric($postId) || $parentThreadId <= 0)
+    {
+        displayError($cfg, 'Could not delete post. Some data was missing.', true);
+    }
+    
+    if ($password === '')
+    {
+        displayError($cfg, 'Could not delete post. Please ensure you entered a password. Please note that if you did not set a password when creating this post then it is not eligible for deletion.', true);
+    }
+    
+    // Retrieve table of contents.
+    $toc = json_decode(file_get_contents($cfg['file']['toc']));
+    if (!$toc)
+    {
+        displayError($cfg, "Coudl not delete post number ($postId) as the table of contents could not be retrieved.", true);
+    }
+    
+    // Retrieve thread data.
+    $threadData = json_decode(file_get_contents($cfg['path']['threads'] . $parentThreadId . '.json'), true);
+    if (!$threadData)
+    {
+        displayError($cfg, "Could not delete post number ($postId) as data for thread number ($parentThreadId) could not be retrieved or data is corrupted.", true);
+    }
+    
+    // Verify post is within this thread.
+    if (!isset($threadData[$postId]))
+    {
+        displayError($cfg, "Could not delete post number ($postId) as it was not found in thread number ($threadId).", true);
+    }
+    
+    // Verify post password is correct.
+    if ($password !== $threadData[$postId]['password'])
+    {
+        displayError($cfg, "Could not delete post number ($postId) as the provided password did not match what was in the database.", true);
+    }
+    
+    // Remove post from thread & save thread.
+    // If it's the topic thread, then the thread data file should be removed.
+    if ($postId === $parentThreadId)
+    {
+        // Remove thread from the table of contents.
+        $threadPos = array_search($parentThreadId, $toc);
+        // If thread exists in ToC, remove it.
+        if ($threadPos !== false)
+        {
+            unset($toc[$threadPos]);
+            $toc = array_values($toc);
+        }
+        
+        // Save updated table of contents.
+        $toc = json_encode($toc, JSON_PRETTY_PRINT);
+        if (!file_put_contents($cfg['file']['toc'], $toc))
+        {
+            displayError($cfg, "Could not delete post/thread number ($postId) as the table of contents could not be updated.", true);
+        }
+        
+        // Delete the thread data file.
+        if (!unlink($cfg['path']['threads'] . $parentThreadId . '.json'))
+        {
+            displayError($cfg, "Could not delete post/thread number ($postId) due to a server error.", true);
+        }
+    }
+    // Otherwise, yank the post from the thread and save the thread data.
+    else
+    {
+        unset($threadData[$postId]);
+        
+        $threadData = json_encode($threadData, JSON_PRETTY_PRINT);
+        if (!file_put_contents($cfg['path']['threads'] . $parentThreadId . '.json', $threadData))
+        {
+            displayError($cfg, "Could not delete post number ($postId). Something prevented the database from being updated.", true);
+        }
+    }
+}
+
+/*
+    Saves a post report to the database.
+*/
+function reportPost($cfg)
+{
+    
 }
 
 function displayError($cfg, $msg = '', $offerSupport = false)

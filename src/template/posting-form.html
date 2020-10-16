@@ -1,0 +1,16 @@
+<form method="post" action="{PROCESSING_SCRIPT}">
+    <table class="milkbbs-posting-form">
+        <tr><td><label for="milkbbs-posting-form-author">Name</label></td><td><input id="milkbbs-posting-form-author" name="author" type="text" placeholder="Anonymous"></td>
+        <tr><td><label for="milkbbs-posting-form-email">Email</label></td><td><input id="milkbbs-posting-form-email" name="email" type="text"></td>
+        <tr><td><label for="milkbbs-posting-form-url">Homepage</label></td><td><input id="milkbbs-posting-form-url" name="url" type="text"></td>
+        <tr><td><label for="milkbbs-posting-form-subject">Subject</label></td><td><input id="milkbbs-posting-form-subject" name="subject" type="text"></td>
+        <tr><td><label for="milkbbs-posting-form-comment">Comment</label></td><td><textarea id="milkbbs-posting-form-comment" name="comment"></textarea></td>
+        <tr><td><label for="milkbbs-posting-form-password">Password</label></td><td><input id="milkbbs-posting-form-password" name="password" type="text" placeholder="(optional, for post deletion)"></td>
+        {VERIFICATION}
+        <tr><td colspan="2">
+            <input name="parentThreadId" type="hidden" value="{PARENT_THREAD_ID}">
+            <input name="callingScript" type="hidden" value="{ORIGIN_FILE}">
+            <input name="createNewPost" type="submit">
+        </td></tr>
+    </table>
+</form>

@@ -24,7 +24,7 @@ return [
     'maxPasswordFieldLength' => 32,
     
     // Board visual display
-    'maxThreadsPerPage' => 3,
+    'maxThreadsPerPage' => 10,
     'maxPostsPerThreadPreview' => 3,
     'maxNavigationPageLinks' => 0, // The visible pages in the navigation bar
     'hideSoftwareStamp' => false, // "Running milkBBS ver 1.32"

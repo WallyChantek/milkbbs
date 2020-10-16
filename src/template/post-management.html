@@ -1,0 +1,32 @@
+<form id="milkbbs-post-management" class="milkbbs-post-management" method="post" action="{PROCESSING_SCRIPT}">
+    <div>
+        Post Management
+        <input name="callingScript" type="hidden" value="{ORIGIN_FILE}">
+        <input id="milkbbs-post-management-thread-id" name="parentThreadId" type="hidden" value="">
+        <input id="milkbbs-post-management-post-id" name="postId" type="hidden">
+    </div>
+    <div>
+        <div>
+            <table>
+                <tr>
+                    <td><label for="milkbbs-post-management-post-id-visual">Post No.</label> <input id="milkbbs-post-management-post-id-visual" type="text" disabled></td>
+                </tr>
+            </table>
+        </div>
+        <div>
+            <table>
+                <tr>
+                    <td><label for="milkbbs-post-management-password">Password</label></td>
+                    <td><input name="password" id="milkbbs-post-management-password" type="text"></td>
+                    <td><input id="milkbbs-post-management-delete-btn" name="deletePost" type="submit" value="Delete"></td>
+                </tr>
+                <tr>
+                    <td><label for="milkbbs-post-management-reason">Reason</label></td>
+                    <td><input name="reason" id="milkbbs-post-management-reason" type="text"></td>
+                    <td><input id="milkbbs-post-management-report-btn" name="reportPost" type="submit" value="Report"></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</form>
+<hr class="milkbbs-hr">

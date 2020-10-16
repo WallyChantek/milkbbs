@@ -94,8 +94,14 @@ function insertIndexPage($cfg)
         }
     }
     
-    // Get the footer
+    // Get the post management section.
+    $html .= getPostManagement($cfg);
+    
+    // Get the footer.
     $html .= getFooter($cfg, $totalNumberOfPages, $pageNum);
+    
+    // Get the JavaScript functions.
+    $html .= getJavaScript($cfg);
     
     $html .= '</div>';
     
@@ -134,7 +140,14 @@ function insertThreadPage($cfg)
         displayError($cfg, 'This thread could not be displayed due to errors.', true);
     }
     
+    // Get the post management section.
+    $html .= getPostManagement($cfg);
+    
+    // Get the footer.
     $html .= getFooter($cfg);
+    
+    // Get the JavaScript functions.
+    $html .= getJavaScript($cfg);
     
     $html .= '</div>';
     
@@ -192,8 +205,8 @@ function getPostForm($cfg, $threadId = '')
     if (isset($qid))
     {
         $verification =
-            '<tr><td colspan="2">' . $q . '<input name="verification-question-id" type="hidden" value="' . $qid . '"></td></tr>'
-          . '<tr><td colspan="2"><input name="verification-answer" type="text"></td>'
+            '<tr><td colspan="2"><label for="milkbbs-posting-form-verification">' . $q . '<input name="verification-question-id" type="hidden" value="' . $qid . '"></label></td></tr>'
+          . '<tr><td colspan="2"><input id="milkbbs-posting-form-verification" name="verification-answer" type="text"></td>'
         ;
     }
     $html = str_replace('{VERIFICATION}', $verification, $html);
@@ -206,16 +219,18 @@ function getPostForm($cfg, $threadId = '')
 */
 function getThread($cfg, $threadData, $showAllReplies = true)
 {
-    $numberOfDisplayedPosts = $showAllReplies ? count($threadData) : min($cfg['maxPostsPerThreadPreview'], count($threadData));
-    $threadId = $threadData[0]['id'];
+    $numberOfDisplayedPosts = isset($cfg['maxPostsPerThreadPreview']) && is_numeric($cfg['maxPostsPerThreadPreview']) ? $cfg['maxPostsPerThreadPreview'] : 0;
+    $numberOfDisplayedPosts = $showAllReplies ? count($threadData) : min($numberOfDisplayedPosts, count($threadData));
+    $tdReordered = array_slice($threadData, 0, 1);
+    $threadId = array_shift($tdReordered)['id'];
     
     $html = '<div class="milkbbs-thread-container">';
     
     // Generate each post for the thread
-    for ($i = 0; $i < $numberOfDisplayedPosts; $i++)
+    $idx = 1;
+    foreach ($threadData as $p)
     {
         // Retrieve and validate post data
-        $p = $threadData[$i];
         $p['id'] = (isset($p['id']) && is_numeric($p['id']) && $p['id'] > 0) ? $p['id'] : 0;
         $p['author'] = isset($p['author']) ? $p['author'] : '';
         $p['email'] = isset($p['email']) ? $p['email'] : '';
@@ -272,9 +287,17 @@ function getThread($cfg, $threadData, $showAllReplies = true)
         $html = str_replace('{SUBJECT}', $p['subject'], $html);
         $html = str_replace('{COMMENT}', $p['comment'], $html);
         $html = str_replace('{DATE}', $p['date'], $html);
-        $html = str_replace('{DELETE}', '[Delete]', $html);
-        $html = str_replace('{REPORT}', '[Report]', $html);
+        $html = str_replace('{DELETE}', '<a class="milkbbs-post-management-link" href="#milkbbs-post-management">[Delete]</a>', $html);
+        $html = str_replace('{REPORT}', '<a class="milkbbs-post-management-link" href="#milkbbs-post-management">[Report]</a>', $html);
         $html = str_replace('{ANCHOR}', $cfg['file']['originFile'] . '?page=thread&id=' . $threadId . '#' . $p['id'], $html);
+        
+        // Increment loop counter and break loop if we've hit the display max.
+        if ($idx === $numberOfDisplayedPosts)
+        {
+            break;
+        }
+        
+        $idx++;
     }
     
     // Add reply button if thread is truncated.
@@ -285,6 +308,18 @@ function getThread($cfg, $threadData, $showAllReplies = true)
     
     $html .= '</div>';
     $html .= '<hr class="milkbbs-hr">';
+    
+    return $html;
+}
+
+/*
+    Generates the post management section for reporting and deleting posts.
+*/
+function getPostManagement($cfg)
+{
+    $html = $cfg['template']['postManagement'];
+    $html = str_replace('{PROCESSING_SCRIPT}', $cfg['path']['webLib'] . 'function/process-post.php', $html);
+    $html = str_replace('{ORIGIN_FILE}', $cfg['file']['originFile'], $html);
     
     return $html;
 }
@@ -369,6 +404,18 @@ function getFooter($cfg, $totalNumberOfPages = 0, $pageNum = 1)
     {
         $html = str_replace('<div class="milkbbs-footer-pages">[<]{PAGES}[>]</div>', '', $html);
     }
+    
+    return $html;
+}
+
+/*
+    Generates the JavaScript necessary for certain page functions.
+*/
+function getJavaScript($cfg)
+{
+    $html = '<script type="text/javascript">';
+    $html .= file_get_contents($cfg['file']['js']);
+    $html .= '</script>';
     
     return $html;
 }

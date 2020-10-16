@@ -10,7 +10,10 @@
 [x] Build out footer (with page numbers and such)
 [x] Index page pagination
 [x] Rename keys for posts in DB (name -> author)
-[ ] Ability to delete posts
+[x] Ability to delete posts
+    [x] Client side
+    [x] Server side
+[ ] Post/thread recycle bin?
 [ ] Word filtering based on blacklist in config
     --- Option to either censor or throw error, or throw misleading error upon
         detecting filtered word

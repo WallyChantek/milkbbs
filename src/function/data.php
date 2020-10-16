@@ -22,57 +22,21 @@ $data['path']['threads'] = $fsLib . 'db/threads/';
 $data['file']['originFile'] = $_SERVER['PHP_SELF'];
 $data['file']['toc'] = $fsLib . 'db/toc.json';
 $data['file']['postCount'] = $fsLib . 'db/postcounter.txt';
+$data['file']['js'] = $fsLib . 'script/milkbbs.js';
 
 // HTML Templates
-$data['template']['form'] =
-    '<form method="post" action="{PROCESSING_SCRIPT}">'
-  . '<table class="milkbbs-posting-form">'
-  . '<tr><td>Name</td><td><input name="author" type="text" placeholder="Anonymous"></td>'
-  . '<tr><td>Email</td><td><input name="email" type="text"></td>'
-  . '<tr><td>Homepage</td><td><input name="url" type="text"></td>'
-  . '<tr><td>Subject</td><td><input name="subject" type="text"></td>'
-  . '<tr><td>Comment</td><td><textarea name="comment"></textarea></td>'
-  . '<tr><td>Password</td><td><input name="password" type="text" placeholder="(optional, for post deletion)"></td>'
-  . '{VERIFICATION}'
-  . '<tr><td colspan="2">'
-  .     '<input name="parentThreadId" type="hidden" value="{PARENT_THREAD_ID}">'
-  .     '<input name="callingScript" type="hidden" value="{ORIGIN_FILE}">'
-  .     '<input type="submit">'
-  . '</td></tr>'
-  . '</table>'
-  . '</form>'
-;
+$data['template']['form'] = file_get_contents($fsLib . 'template/posting-form.html');
+$data['template']['post'] = file_get_contents($fsLib . 'template/post.html');
+$data['template']['postManagement'] = file_get_contents($fsLib . 'template/post-management.html');
+$data['template']['footer'] = file_get_contents($fsLib . 'template/footer.html');
 
-$data['template']['post'] =
-    '<div class="milkbbs-entry" id="{POST_ID}">'
-  .     '<div>'
-  .         '<div class="milkbbs-post-name"><a href="mailto:{EMAIL}">{AUTHOR}</a>&nbsp;<a class="milkbbs-post-url" href="{URL}">[URL]</a></div>'
-  .         '<div class="milkbbs-post-number">No. {POST_ID}&nbsp;<a href="{ANCHOR}">#</a></div>'
-  .     '</div>'
-  .     '<div>'
-  .         '<div class="milkbbs-post-subject">{SUBJECT}</div>'
-  .     '</div>'
-  .     '<div>'
-  .         '<div class="milkbbs-post-comment">{COMMENT}</div>'
-  .     '</div>'
-  .     '<div>'
-  .         '<div class="milkbbs-post-date">{DATE}</div>'
-  .         '<div>'
-  .             '<span class="milkbbs-post-report">{REPORT}</span>&nbsp;'
-  .             '<span class="milkbbs-post-delete">{DELETE}</span>'
-  .         '</div>'
-  .     '</div>'
-  . '</div>'
-;
-
-$data['template']['footer'] =
-    '<div class="milkbbs-footer">'
-        . '<div class="milkbbs-footer-pages">[<]{PAGES}[>]</div>'
-        . '<div class="milkbbs-footer-info">[Admin]</div>'
-        . '<div class="milkbbs-footer-info">Running milkBBS v0.54</div>'
-    . '</div>'
-
-;
+// Strip linebreaks and tabs from templates
+foreach ($data['template'] as $name => $template)
+{
+    $template = str_replace(array("\r", "\n"), '', $template);
+    $template = str_replace('    ', '', $template);
+    $data['template'][$name] = $template;
+}
 
 return $data;
 
