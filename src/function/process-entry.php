@@ -10,7 +10,7 @@ set_error_handler('milkgb\customErrorHandler');
 set_exception_handler('milkgb\customExceptionHandler');
 
 // Load common functions and data.
-require_once('common-functions.php');
+include('common-functions.php');
 
 // Load and validate user configuration.
 $cfg = include(dirname(__FILE__) . '/../user-config.php');
