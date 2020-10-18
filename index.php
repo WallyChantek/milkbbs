@@ -3,7 +3,7 @@
 <head>
 <title>milkGB</title>
 <meta charset="utf-8">
-<link rel="stylesheet" href="/milkbbs-dev/milkbbs/src/style/milkbbs.css">
+<link rel="stylesheet" href="/milkgb-dev/milkgb/src/style/milkgb.css">
 </head>
 <body>
 <div class="wrapper">
@@ -11,7 +11,7 @@
 <?php
 
 include('src/autoload.php');
-milkbbs\loadMilkBBS();
+milkgb\loadMilkGB();
 
 ?>
 

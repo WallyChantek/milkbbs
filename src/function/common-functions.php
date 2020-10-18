@@ -1,6 +1,6 @@
 <?php
 
-namespace milkbbs;
+namespace milkgb;
 
 function loadSystemData()
 {
@@ -34,7 +34,7 @@ function loadSystemData()
     $data['html']['entryError'] = file_get_contents($fsLib . 'template/entry-error.html');
     $data['html']['entryManagement'] = file_get_contents($fsLib . 'template/entry-management.html');
     $data['html']['footer'] = file_get_contents($fsLib . 'template/footer.html');
-    $data['html']['javascript'] = file_get_contents($fsLib . 'script/milkbbs.js');
+    $data['html']['javascript'] = file_get_contents($fsLib . 'script/milkgb.js');
 
     // Strip linebreaks and tabs from templates
     foreach ($data['html'] as $name => $html)

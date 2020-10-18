@@ -1,18 +1,18 @@
-<form class="milkbbs-entry-management" method="post" action="{PROCESSING_SCRIPT}">
+<form class="milkgb-entry-management" method="post" action="{PROCESSING_SCRIPT}">
     <div>
         Entry Management
-        <input name="callingScript" type="hidden" value="{ORIGIN_FILE}">
-        <input id="milkbbs-entry-management-entry-id" name="entryId" type="hidden">
+        <input type="hidden" name="callingScript" value="{ORIGIN_FILE}">
+        <input type="hidden" id="milkgb-entry-management-entry-id" name="entryId">
     </div>
     <div>
         <div>
-            <label for="milkbbs-entry-management-entry-id-visual">Entry No.</label> <input id="milkbbs-entry-management-entry-id-visual" type="text" disabled>
+            <label for="milkgb-entry-management-entry-id-visual">Entry No.</label> <input type="text" id="milkgb-entry-management-entry-id-visual" disabled>
         </div>
         <div>
-            <label for="milkbbs-entry-management-password">Password</label>
-            <input name="password" id="milkbbs-entry-management-password" type="text">
-            <input id="milkbbs-entry-management-delete-btn" name="deleteEntry" type="submit" value="Delete">
+            <label for="milkgb-entry-management-password">Password</label>
+            <input type="text" name="password" id="milkgb-entry-management-password">
+            <input type="submit" id="milkgb-entry-management-delete-btn" name="deleteEntry">
         </div>
     </div>
 </form>
-<hr class="milkbbs-hr">
+<hr class="milkgb-hr">

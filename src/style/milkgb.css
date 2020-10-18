@@ -1,41 +1,41 @@
-.milkbbs * {
+.milkgb * {
     box-sizing: border-box;
 }
 
-.milkbbs-posting-form td:nth-child(1) {
+.milkgb-posting-form td:nth-child(1) {
     width: 1px;
 }
 
-.milkbbs-posting-form td:nth-child(2) input,
-.milkbbs-posting-form td:nth-child(2) textarea {
+.milkgb-posting-form td:nth-child(2) input,
+.milkgb-posting-form td:nth-child(2) textarea {
     width: 100%;
 }
 
-.milkbbs-posting-form td:nth-child(2) textarea {
+.milkgb-posting-form td:nth-child(2) textarea {
     resize: none;
 }
 
-.milkbbs-entry > div {
+.milkgb-entry > div {
     display: flex;
     justify-content: space-between;
 }
 
-.milkbbs-entry-subject,
-.milkbbs-entry-comment {
+.milkgb-entry-subject,
+.milkgb-entry-comment {
     width: 100%;
 }
 
-.milkbbs-entry-management {
+.milkgb-entry-management {
     display: flex;
     flex-direction: column;
 }
 
-.milkbbs-entry-management > div:nth-child(2) {
+.milkgb-entry-management > div:nth-child(2) {
     display: flex;
     justify-content: space-between;
 }
 
-.milkbbs-footer {
+.milkgb-footer {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -45,64 +45,71 @@
 
 
 /* -- THEME CSS: BREAK INTO SEPARATE FILE WHEN DONE!!!! -- */
-.milkbbs * {
+.milkgb * {
     font-family: Tahoma;
     font-size: 11px;
 }
 
-.milkbbs-hr {
+.milkgb-hr {
     border: none;
     border-top: 1px dotted #c0c0c0;
 }
 
-.milkbbs-posting-form {
+.milkgb-posting-form {
     width: 100%;
     padding: 0 24px;
     margin-bottom: 20px;
 }
 
-.milkbbs-entry {
+.milkgb-entry {
     border: 1px solid #a0a0a0;
     border-bottom: none;
 }
 
-.milkbbs-entry {
+.milkgb-entry {
     margin-top: 20px;
     margin-bottom: 20px;
     padding: 4px;
     border-bottom: 1px solid #a0a0a0;
 }
 
-.milkbbs-entry-author {
+.milkgb-entry-author {
     font-weight: bold;
 }
 
-.milkbbs-entry-comment {
+.milkgb-entry-comment {
     background: #e0e0e0;
     padding: 4px;
     margin: 4px 0;
 }
 
-.milkbbs-footer-pages {
+.milkgb-footer-pages {
     background: #e0e0e0;
     padding: 4px;
 }
 
-.milkbbs-error-container {
+.milkgb-error-container {
     border: 1px solid #a0a0a0;
     padding: 4px;
 }
 
-.milkbbs-error-container div {
+.milkgb-error-container div {
     text-align: center;
+}
+
+.milkgb-standalone-error-container {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
 }
 
 
 
 /* -- USERSTYLE CSS: REMOVE ME WHEN DONE!!!! -- */
-/* .milkbbs-posting-form, */
-/* .milkbbs-entry, */
-/* .milkbbs-error-container { */
+/* .milkgb-posting-form, */
+/* .milkgb-entry, */
+/* .milkgb-error-container { */
     /* width: 480px; */
 /* } */
 

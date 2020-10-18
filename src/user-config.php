@@ -29,7 +29,7 @@ return [
     // Board visual display
     'maxEntriesPerPage' => 10,
     'maxNavigationPageLinks' => 0, // The visible pages in the navigation bar
-    'hideSoftwareStamp' => false, // "Running milkBBS ver 1.32"
+    'hideSoftwareStamp' => false, // "Running milkGB ver 1.32"
     'timezone' => 'America/New_York',
     
     // Board functionality

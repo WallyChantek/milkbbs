@@ -1,8 +1,13 @@
 <?php
 
-namespace milkbbs;
+namespace milkgb;
+use Exception;
 
 error_reporting(E_ALL);
+
+require_once('handlers.php');
+set_error_handler('milkgb\customErrorHandler');
+set_exception_handler('milkgb\customExceptionHandler');
 
 // Load common functions and data.
 require_once('common-functions.php');
@@ -14,17 +19,21 @@ $cfg = validateUserData($cfg);
 // Load system configuration
 $cfg = array_merge($cfg, loadSystemData());
 
+// Set constant indicating whether enhanced debugging should be shown.
+define(__NAMESPACE__ . '\DEV_MODE', $cfg['devMode']);
+define(__NAMESPACE__ . '\WEB_LIB', $cfg['path']['webLib']);
+
 // Set default time zone.
-date_default_timezone_set($cfg['timezone']);
+date_default_timezone_set('UTC');
 
 // Only process data if a POST occurred.
 if ($_POST)
 {
-    if (isset($_POST['createNewPost']))
+    if (isset($_POST['createNewEntry']))
     {
         savePost($cfg, validatePostData($cfg));
     }
-    else if (isset($_POST['deletePost']) && $cfg['entryDeletingEnabled'])
+    else if (isset($_POST['deleteEntry']) && $cfg['entryDeletingEnabled'])
     {
         deletePost($cfg);
     }
@@ -36,10 +45,6 @@ if ($_POST)
     // Redirect to main page.
     header( 'Location: ' . $_POST['callingScript'], true, 303 );
     exit();
-}
-else
-{
-    displayError($cfg, 'No POST data provided or something else went wrong.');
 }
 
 /*
@@ -326,24 +331,37 @@ function deletePost($cfg)
     }
 }
 
-function displayError($cfg, $msg = '', $offerSupport = false)
+
+
+
+function displayError($msg)
 {
+    $devModeHtml = '';
+    $webLib = '';
+    if (defined(__namespace__ . '\DEV_MODE') && namespace\DEV_MODE || !defined(__namespace__ . '\DEV_MODE'))
+        $devModeHtml = '<div class="milkgb-error-details">' . $msg . '</div>';
+    if (defined(__namespace__ . '\WEB_LIB'))
+        $webLib = namespace\WEB_LIB;
+    
     $html = '<!DOCTYPE html>'
           . '<html lang="en">'
           . '<head>'
           . '<title>milkBBS</title>'
           . '<meta charset="utf-8">'
-          . '<link rel="stylesheet" href="' . $cfg['path']['webLib'] . 'style/milkbbs.css">'
+          . ($webLib ? '<link rel="stylesheet" href="' . namespace\WEB_LIB . 'style/milkgb.css">' : '')
           . '</head>'
           . '<body>'
     ;
     
-    $html .= '<div class="milkbbs-error-container milkbbs-standalone-error-container">'
-           . '<div class="milkbbs-error-logo">milkBBS Logo</div>'
-           . '<div class="milkbbs-error-title">milkBBS</div>'
-           . '<div class="milkbbs-error-message">Error: ' . $msg . ($offerSupport ? ' Please contact the server administrator if this issue persists.' : '') . '</div>'
-           . '<div class="milkbbs-error-return-link"><a href="javascript:history.back()">[Return]</a></div>'
-           . '</div>'
+    $html .= '<div class="milkgb">'
+          .     '<div class="milkgb-error-container milkgb-standalone-error-container">'
+          .         '<div class="milkgb-error-logo">milkGB Logo</div>'
+          .         '<div class="milkgb-error-title">milkGB</div>'
+          .         '<div class="milkgb-error-message">An error occurred. Please contact the server administrator if this issue persists.</div>'
+          .         $devModeHtml
+          .         '<div class="milkbbs-error-return-link"><a href="javascript:history.back()">[Return]</a></div>'
+          .     '</div>'
+          . '</div>'
     ;
     
     $html .= '</body>'

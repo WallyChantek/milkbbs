@@ -1,14 +1,15 @@
 <?php
 
-namespace milkbbs;
+namespace milkgb;
 use Exception;
 
 error_reporting(E_ALL);
 
-set_error_handler('milkbbs\customErrorHandler');
-set_exception_handler('milkbbs\customExceptionHandler');
+require_once('handlers.php');
+set_error_handler('milkgb\customErrorHandler');
+set_exception_handler('milkgb\customExceptionHandler');
 
-function loadMilkBBS()
+function loadMilkGB()
 {
     // Load common functions and data.
     require_once('common-functions.php');
@@ -32,7 +33,7 @@ function loadMilkBBS()
 */
 function insertPageContent($cfg)
 {
-    $html = '<div class="milkbbs">';
+    $html = '<div class="milkgb">';
     
     // Get form for writing a new entry.
     $html .= generatePostingForm($cfg);
@@ -118,14 +119,14 @@ function generatePostingForm($cfg)
     if (isset($qid))
     {
         $verification =
-            '<tr><td colspan="2"><label for="milkbbs-posting-form-verification">' . $q . '<input name="verification-question-id" type="hidden" value="' . $qid . '"></label></td></tr>'
-          . '<tr><td colspan="2"><input id="milkbbs-posting-form-verification" name="verification-answer" type="text"></td>'
+            '<tr><td colspan="2"><label for="milkgb-posting-form-verification">' . $q . '<input type="hidden" name="verification-question-id" value="' . $qid . '"></label></td></tr>'
+          . '<tr><td colspan="2"><input type="text" id="milkgb-posting-form-verification" name="verification-answer"></td>'
         ;
     }
     $html = str_replace('{VERIFICATION}', $verification, $html);
     
     // Insert error message if user previously attempted to posted but it failed.
-    $html = str_replace('{ERROR_MSG}', '<tr><td colspan="2"><div class="milkbbs-posting-forum-error">ERROR HERE!</div></td></tr>', $html);
+    $html = str_replace('{ERROR_MSG}', '<tr><td colspan="2"><div class="milkgb-posting-forum-error">ERROR HERE!</div></td></tr>', $html);
     
     return $html;
 }
@@ -158,7 +159,7 @@ function getEntry($cfg, $entry)
         $html = str_replace('<a href="mailto:{EMAIL}">{AUTHOR}</a>', '{AUTHOR}', $html);
     
     if ($entry['url'] === '')
-        $html = str_replace('&nbsp;<a class="milkbbs-entry-url" href="{URL}">[URL]</a>', '', $html);
+        $html = str_replace('&nbsp;<a class="milkgb-entry-url" href="{URL}">[URL]</a>', '', $html);
     
     // Escape HTML characters in strings so they aren't parsed.
     foreach ($entry as $key => $val)
@@ -177,7 +178,7 @@ function getEntry($cfg, $entry)
     $html = str_replace('{SUBJECT}', $entry['subject'], $html);
     $html = str_replace('{COMMENT}', $entry['comment'], $html);
     $html = str_replace('{DATE}', $entry['date'], $html);
-    $html = str_replace('{DELETE}', '<a href="#milkbbs-post-management">[Delete]</a>', $html);
+    $html = str_replace('{DELETE}', '<a href="#milkgb-post-management">[Delete]</a>', $html);
     
     return $html;
 }
@@ -272,7 +273,7 @@ function getFooter($cfg, $totalNumberOfPages = 0, $pageNum = 1)
     }
     else
     {
-        $html = str_replace('<div class="milkbbs-footer-pages">[<]{PAGES}[>]</div>', '', $html);
+        $html = str_replace('<div class="milkgb-footer-pages">[<]{PAGES}[>]</div>', '', $html);
     }
     
     return $html;
@@ -297,13 +298,13 @@ function displayError($msg)
 {
     $devModeHtml = '';
     if (defined(__namespace__ . '\DEV_MODE') && namespace\DEV_MODE || !defined(__namespace__ . '\DEV_MODE'))
-        $devModeHtml = '<div class="milkbbs-error-details">' . $msg . '</div>';
+        $devModeHtml = '<div class="milkgb-error-details">' . $msg . '</div>';
     
-    $html = '<div class="milkbbs">'
-          .     '<div class="milkbbs-error-container">'
-          .         '<div class="milkbbs-error-logo">milkBBS Logo</div>'
-          .         '<div class="milkbbs-error-title">milkBBS</div>'
-          .         '<div class="milkbbs-error-message">An error occurred. Please contact the server administrator if this issue persists.' . '</div>'
+    $html = '<div class="milkgb">'
+          .     '<div class="milkgb-error-container">'
+          .         '<div class="milkgb-error-logo">milkGB Logo</div>'
+          .         '<div class="milkgb-error-title">milkGB</div>'
+          .         '<div class="milkgb-error-message">An error occurred. Please contact the server administrator if this issue persists.</div>'
           .         $devModeHtml
           .     '</div>'
           . '</div>'
@@ -314,37 +315,5 @@ function displayError($msg)
     exit();
 }
 
-/*
-    This function gets called auotmatically when an error of any type occurs.
-    It will raise an exception, which will then display an error and halt
-    execution if it is not caught and handled accordingly.
-*/
-function customErrorHandler($errno, $errstr, $errfile, $errline)
-{
-    // Escape error string since we're going to display it as HTML.
-    $errstr = htmlspecialchars($errstr);
-    
-    // Build user-friendly markup for reading error details.
-    $msg = "<div>Error Details:</div>"
-         . "<div>Error</div>"
-         . "<div>$errstr</div>"
-         . "<div>File</div>"
-         . "<div>$errfile</div>"
-         . "<div>Line</div>"
-         . "<div>$errline</div>"
-    ;
-    
-    throw new Exception($msg);
-}
-
-/*
-    This function gets called automaticaly when an exception is thrown. It will
-    display an error and halt execution if it is not caught and handled
-    accordingly.
-*/
-function customExceptionHandler($exception)
-{
-    displayError($exception->getMessage());
-}
 
 ?>
