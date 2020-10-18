@@ -1,17 +1,18 @@
 <form method="post" action="{PROCESSING_SCRIPT}">
     <table class="milkgb-posting-form">
-        <tr><td><label for="milkgb-posting-form-author">Name</label></td><td><input type="text" id="milkgb-posting-form-author" name="author" placeholder="Anonymous"></td>
-        <tr><td><label for="milkgb-posting-form-email">Email</label></td><td><input type="text" id="milkgb-posting-form-email" name="email"></td>
-        <tr><td><label for="milkgb-posting-form-url">Homepage</label></td><td><input type="text" id="milkgb-posting-form-url" name="url"></td>
-        <tr><td><label for="milkgb-posting-form-subject">Subject</label></td><td><input type="text" id="milkgb-posting-form-subject" name="subject"></td>
-        <tr><td><label for="milkgb-posting-form-comment">Comment</label></td><td><textarea id="milkgb-posting-form-comment" name="comment"></textarea></td>
-        <tr><td><label for="milkgb-posting-form-password">Password</label></td><td><input type="text" id="milkgb-posting-form-password" name="password" placeholder="(optional, for post deletion)"></td>
+        <tr><td><label for="milkgb-posting-form-author">Name</label></td><td><input type="text" id="milkgb-posting-form-author" name="author" placeholder="Anonymous"></td></tr>
+        <tr><td><label for="milkgb-posting-form-email">Email</label></td><td><input type="text" id="milkgb-posting-form-email" name="email"></td></tr>
+        <tr><td><label for="milkgb-posting-form-url">Homepage</label></td><td><input type="text" id="milkgb-posting-form-url" name="url"></td></tr>
+        <tr><td><label for="milkgb-posting-form-subject">Subject</label></td><td><input type="text" id="milkgb-posting-form-subject" name="subject"></td></tr>
+        <tr><td><label for="milkgb-posting-form-comment">Comment</label></td><td><textarea id="milkgb-posting-form-comment" name="comment"></textarea></td></tr>
+        <tr><td><label for="milkgb-posting-form-password">Password</label></td><td><input type="text" id="milkgb-posting-form-password" name="password" placeholder="(optional, for post deletion)"></td></tr>
         {VERIFICATION}
-        {ERROR_MSG}
-        <tr><td colspan="2">
-            <input type="hidden" name="callingScript" value="{ORIGIN_FILE}">
-            <input type="submit" name="createNewEntry">
-        </td></tr>
+        <tr>
+            <td colspan="2">
+                <input type="hidden" name="callingScript" value="{ORIGIN_FILE}">
+                <input type="submit" name="createNewEntry">
+            </td>
+        </tr>
     </table>
 </form>
 <hr class="milkgb-hr">

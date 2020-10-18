@@ -1,6 +1,7 @@
 <?php
 
 namespace milkgb;
+use Exception;
 
 function loadSystemData()
 {
@@ -28,7 +29,7 @@ function loadSystemData()
     $data['file']['toc'] = $fsLib . 'db/toc.json';
     $data['file']['entryCount'] = $fsLib . 'db/entrycount.txt';
 
-    // HTML Templates
+    // HTML & JS Templates
     $data['html']['form'] = file_get_contents($fsLib . 'template/posting-form.html');
     $data['html']['entry'] = file_get_contents($fsLib . 'template/entry.html');
     $data['html']['entryError'] = file_get_contents($fsLib . 'template/entry-error.html');
@@ -61,16 +62,37 @@ function validateUserData($cfg)
 **/
 function json_decode_ex($json)
 {
-    return json_decode($json, true, $depth=512, JSON_THROW_ON_ERROR);
+    
+    $data = json_decode($json, true);
+    
+    if (JSON_ERROR_NONE !== json_last_error()) {
+        throw new Exception(
+            'json_decode error: ' . json_last_error_msg()
+          . '<br>json string:<br>' . $json
+        );
+    }
+    
+    return $data;
+    
+    
 }
 
 /**
     This function serves as a shorthand helper function for json_decode().
     It will always throw an error if some sort of error occurred.
 **/
-function json_encode_ex($arr)
+function json_encode_ex($arr, $options = 0)
 {
-    return json_encode($arr, JSON_THROW_ON_ERROR);
+    $data = json_encode($arr, $options);
+    
+    if (JSON_ERROR_NONE !== json_last_error()) {
+        throw new Exception(
+            'json_encode error: ' . json_last_error_msg()
+          . '<br>array data:<br>' . print_r($arr, true)
+        );
+    }
+    
+    return $data;
 }
 
 ?>

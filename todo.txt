@@ -13,34 +13,32 @@
 [x] Ability to delete posts
     [x] Client side
     [x] Server side
-[ ] Administrative control panel
-[ ] Ability to report posts (reported posts show up in admin panel)
-[ ] Word filtering based on blacklist in config
+[x] Admin password for deletion
+[x] Word filtering based on blacklist in config
     --- Option to either censor or throw error, or throw misleading error upon
         detecting filtered word
+[x] Line breaks in comments
+[ ] File uploader
 [/] Server-side post data validation
     [x] Field lengths
     [x] Field types (e-mail, url, etc.)
-    [ ] Text encoding? Maybe everything is received in unicode?
+    [x] Text encoding? Maybe everything is received in unicode?
+        --- I'm pretty sure json_encode() handles this automatically and I don't
+            need to worry about it as such
     [ ] Files
-[ ] Line breaks in comments
-[ ] Locking mechanism to prevent writing overlaps from multiple posts
+[ ] Post preview
 [ ] Formatting codes with simple editor
-    --- Add ability to respond to posts a 2ch's ">>" (also implement quoting
-        via ">");
-[ ] File uploader
+[ ] Validate verification questions/answers upon main page load for a pre-check
 [/] Configuration file additions
     [x] Ability to enable/disable anti-bot verification
     [x] Ability to enable/disable anti-bot verification answer case sensitivity
     [x] Option to specify maximum length for fields
-    [/] Ability to set timezone (overall, even for displaying existing thread
+    [x] Ability to set timezone (overall, even for displaying existing thread
         times; in tandem with this, change time in database to UTC)
     [/] Ability to enable/disable file uploader
-    [/] Option to specify maximum number of replies for a thread
-[ ] Post preview
-[ ] Tripcodes for names
-[ ] More secure bot check (like some sort of token)?
+[ ] Locking mechanism to prevent writing overlaps from multiple posts
 [ ] Validate user configuration data (function is in common-functions.php)
+[ ] Document functions and specify what the parameters are
 
 
 [ ] Run through freshly-initialized server & test everything

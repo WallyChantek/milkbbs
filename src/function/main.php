@@ -5,9 +5,14 @@ use Exception;
 
 error_reporting(E_ALL);
 
+define(__NAMESPACE__ . '\STANDALONE_PAGE', false);
+
 require_once('handlers.php');
 set_error_handler('milkgb\customErrorHandler');
 set_exception_handler('milkgb\customExceptionHandler');
+
+// Set default time zone.
+date_default_timezone_set('UTC');
 
 function loadMilkGB()
 {
@@ -15,8 +20,7 @@ function loadMilkGB()
     include('common-functions.php');
     
     // Load and validate user configuration.
-    $cfg = include(dirname(__FILE__) . '/../user-config.php');
-    $cfg = validateUserData($cfg);
+    $cfg = validateUserData(include(dirname(__FILE__) . '/../user-config.php'));
     
     // Load system configuration.
     $cfg = array_merge($cfg, loadSystemData());
@@ -43,33 +47,36 @@ function insertPageContent($cfg)
     $pageNum = 1;
     if (file_exists($cfg['file']['toc']))
     {
-        $toc = json_decode(file_get_contents($cfg['file']['toc']));
-        if (!is_array($toc))
-            displayError('Corrupted table of contents.');
+        $toc = json_decode_ex(file_get_contents($cfg['file']['toc']));
         
-        $pageNum = (isset($_GET['pageNum']) && is_numeric($_GET['pageNum'])) ? intval($_GET['pageNum']) : 1;
-        $maxEntriesPerPage = $cfg['maxEntriesPerPage'] > 0 ? min($cfg['maxEntriesPerPage'], count($toc)) : count($toc);
-        $totalNumberOfPages = ceil(count($toc) / $maxEntriesPerPage);
-        
-        // Constrain page number if it exceeds boundaries.
-        if ($pageNum < 1)
-            $pageNum = 1;
-        elseif ($pageNum > $totalNumberOfPages)
-            $pageNum = $totalNumberOfPages;
-        
-        // Generate HTML for entries.
-        for ($i = (($pageNum - 1) * $maxEntriesPerPage); $i < min(($maxEntriesPerPage * $pageNum), count($toc)); $i++)
+        if (count($toc) > 0)
         {
-            try
+            $pageNum = (isset($_GET['pageNum']) && is_numeric($_GET['pageNum'])) ? intval($_GET['pageNum']) : 1;
+            $maxEntriesPerPage = $cfg['maxEntriesPerPage'] > 0 ? min($cfg['maxEntriesPerPage'], count($toc)) : count($toc);
+            $totalNumberOfPages = ceil(count($toc) / $maxEntriesPerPage);
+            
+            // Constrain page number if it exceeds boundaries.
+            if ($pageNum < 1)
+                $pageNum = 1;
+            elseif ($pageNum > $totalNumberOfPages)
+                $pageNum = $totalNumberOfPages;
+            
+            // Generate HTML for entries.
+            for ($i = (($pageNum - 1) * $maxEntriesPerPage); $i < min(($maxEntriesPerPage * $pageNum), count($toc)); $i++)
             {
-                $entryData = json_decode_ex(file_get_contents($cfg['path']['entries'] . $toc[$i] . '.json'));
-                $html .= getEntry($cfg, $entryData);
-            }
-            catch (Exception $exc)
-            {
-                $badEntryHtml = $cfg['html']['entryError'];
-                $badEntryHtml = str_replace('{ENTRY_ID}', $toc[$i], $badEntryHtml);
-                $html .= $badEntryHtml;
+                $entryId = $toc[$i];
+                try
+                {
+                    $entryData = json_decode_ex(file_get_contents($cfg['path']['entries'] . $entryId . '.json'));
+                    $entryData['id'] = $entryId;
+                    $html .= getEntry($cfg, $entryData);
+                }
+                catch (Exception $exc)
+                {
+                    $badEntryHtml = $cfg['html']['entryError'];
+                    $badEntryHtml = str_replace('{ENTRY_ID}', $entryId, $badEntryHtml);
+                    $html .= $badEntryHtml;
+                }
             }
         }
     }
@@ -103,7 +110,7 @@ function generatePostingForm($cfg)
             $qid = array_rand($questions);
             
             if (!isset($questions[$qid][0]) || !isset($questions[$qid][1]))
-                displayError($cfg, 'Something went wrong loading the anti-bot verification. The data may be corrupt.', true);
+                displayError('Something went wrong loading the anti-bot verification. The data may be corrupt.');
             
             $q = $questions[$qid][0];
         }
@@ -120,13 +127,10 @@ function generatePostingForm($cfg)
     {
         $verification =
             '<tr><td colspan="2"><label for="milkgb-posting-form-verification">' . $q . '<input type="hidden" name="verification-question-id" value="' . $qid . '"></label></td></tr>'
-          . '<tr><td colspan="2"><input type="text" id="milkgb-posting-form-verification" name="verification-answer"></td>'
+          . '<tr><td colspan="2"><input type="text" id="milkgb-posting-form-verification" name="verification-answer"></td></tr>'
         ;
     }
     $html = str_replace('{VERIFICATION}', $verification, $html);
-    
-    // Insert error message if user previously attempted to posted but it failed.
-    $html = str_replace('{ERROR_MSG}', '<tr><td colspan="2"><div class="milkgb-posting-forum-error">ERROR HERE!</div></td></tr>', $html);
     
     return $html;
 }
@@ -161,6 +165,17 @@ function getEntry($cfg, $entry)
     if ($entry['url'] === '')
         $html = str_replace('&nbsp;<a class="milkgb-entry-url" href="{URL}">[URL]</a>', '', $html);
     
+    // Convert datetime to match timezone specified in configuration.
+    if ($entry['date'] !== '')
+    {
+        $dt = new \DateTime($entry['date']);
+        $dt->setTimeZone(new \DateTimeZone($cfg['timezone']));
+        if ($cfg['24HourClock'])
+            $entry['date'] = $dt->format('Y-m-d (D) H:i');
+        else
+            $entry['date'] = $dt->format('Y-m-d (D) h:i A');
+    }
+    
     // Escape HTML characters in strings so they aren't parsed.
     foreach ($entry as $key => $val)
     {
@@ -169,6 +184,9 @@ function getEntry($cfg, $entry)
             $entry[$key] = htmlspecialchars($val);
         }
     }
+    
+    // Replace formatting tags in commment with appropriate markup.
+    $entry['comment'] = str_replace('{NEW_LINE}', '<br>', $entry['comment']);
     
     // Replace template tags with entry data.
     $html = str_replace('{ENTRY_ID}', $entry['id'], $html);
@@ -290,30 +308,5 @@ function getJavaScript($cfg)
     
     return $html;
 }
-
-/*
-    Outputs an error to the user and halts further execution.
-*/
-function displayError($msg)
-{
-    $devModeHtml = '';
-    if (defined(__namespace__ . '\DEV_MODE') && namespace\DEV_MODE || !defined(__namespace__ . '\DEV_MODE'))
-        $devModeHtml = '<div class="milkgb-error-details">' . $msg . '</div>';
-    
-    $html = '<div class="milkgb">'
-          .     '<div class="milkgb-error-container">'
-          .         '<div class="milkgb-error-logo">milkGB Logo</div>'
-          .         '<div class="milkgb-error-title">milkGB</div>'
-          .         '<div class="milkgb-error-message">An error occurred. Please contact the server administrator if this issue persists.</div>'
-          .         $devModeHtml
-          .     '</div>'
-          . '</div>'
-    ;
-    
-    echo $html;
-    
-    exit();
-}
-
 
 ?>

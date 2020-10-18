@@ -4,6 +4,14 @@ return [
     // Developer mode, enables error details. Set to false when ready to deploy.
     'devMode' => true,
     
+    // Admin password for deleting posts.
+    // You should generate this on your own by using...
+    //     > password_hash("your_password_here", PASSWORD_DEFAULT);
+    // ...and store the hash in this key. Do not store a plaintext password,
+    // not only because it's incredibly insecure, but also because it'll end up
+    // failing every time anyway.
+    'adminPasswordHash' => '$2y$10$0eKxzmKn/y3WVSzkxxyqPurkhom3Xn8j4Iuw5H.qk7pJbX5rNVzLe', // password
+    
     // Anti-bot verification
     'antiBotVerificationEnabled' => false,
     'antiBotVerificationIsCaseSensitive' => false,
@@ -29,18 +37,20 @@ return [
     // Board visual display
     'maxEntriesPerPage' => 10,
     'maxNavigationPageLinks' => 0, // The visible pages in the navigation bar
-    'hideSoftwareStamp' => false, // "Running milkGB ver 1.32"
+    'showSoftwareStamp' => true, // "Running milkGB ver 1.32"
     'timezone' => 'America/New_York',
+    '24HourClock' => true,
     
     // Board functionality
     'entryDeletingEnabled' => true,
-    'maxRepliesPerThread' => 256,
     
     // Word filtering
-    'wordFilterMode' => 'censor', // censor, error, or mislead
+    'wordFilterMode' => 'error', // censor, error, or mislead
     'wordFilters' => [
-        'sample_bad_word'
-    ]
+        'apple',
+        'orange'
+    ],
+    'showFilteredWords' => true // Tells the user what words were filtered when using mode "error"
 ];
 
 ?>
