@@ -1,6 +1,9 @@
 <?php
 
 return [
+    // Developer mode, enables error details. Set to false when ready to deploy.
+    'devMode' => true,
+    
     // Anti-bot verification
     'antiBotVerificationEnabled' => false,
     'antiBotVerificationIsCaseSensitive' => false,
@@ -24,16 +27,13 @@ return [
     'maxPasswordFieldLength' => 32,
     
     // Board visual display
-    'maxThreadsPerPage' => 10,
-    'maxPostsPerThreadPreview' => 3,
+    'maxEntriesPerPage' => 10,
     'maxNavigationPageLinks' => 0, // The visible pages in the navigation bar
     'hideSoftwareStamp' => false, // "Running milkBBS ver 1.32"
-    'hideAdminPanelLink' => false,
     'timezone' => 'America/New_York',
     
     // Board functionality
-    'postDeletingEnabled' => true,
-    'postReportingEnabled' => true, // Reporting bad posts, not metrics
+    'entryDeletingEnabled' => true,
     'maxRepliesPerThread' => 256,
     
     // Word filtering

@@ -7,10 +7,11 @@
         <tr><td><label for="milkbbs-posting-form-comment">Comment</label></td><td><textarea id="milkbbs-posting-form-comment" name="comment"></textarea></td>
         <tr><td><label for="milkbbs-posting-form-password">Password</label></td><td><input id="milkbbs-posting-form-password" name="password" type="text" placeholder="(optional, for post deletion)"></td>
         {VERIFICATION}
+        {ERROR_MSG}
         <tr><td colspan="2">
-            <input name="parentThreadId" type="hidden" value="{PARENT_THREAD_ID}">
             <input name="callingScript" type="hidden" value="{ORIGIN_FILE}">
             <input name="createNewPost" type="submit">
         </td></tr>
     </table>
 </form>
+<hr class="milkbbs-hr">

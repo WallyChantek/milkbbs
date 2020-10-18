@@ -1,101 +1,80 @@
 <?php
 
 namespace milkbbs;
+use Exception;
 
 error_reporting(E_ALL);
 
+set_error_handler('milkbbs\customErrorHandler');
+set_exception_handler('milkbbs\customExceptionHandler');
+
 function loadMilkBBS()
 {
-    // Load common functions
+    // Load common functions and data.
     require_once('common-functions.php');
     
     // Load and validate user configuration.
-    $cfg = require_once(dirname(__FILE__) . '/../user-config.php');
+    $cfg = include(dirname(__FILE__) . '/../user-config.php');
     $cfg = validateUserData($cfg);
     
-    // Load system configuration
-    $cfg = array_merge($cfg, require_once('data.php'));
+    // Load system configuration.
+    $cfg = array_merge($cfg, loadSystemData());
     
-    // Generate page based on URL's GET data.
-    $requestedPage = isset($_GET['page']) ? $_GET['page'] : '';
-    switch ($requestedPage)
-    {
-        case 'thread':
-            insertThreadPage($cfg);
-            break;
-        case 'admin':
-            insertAdinPage($cfg);
-            break;
-        default:
-            insertIndexPage($cfg);
-    }
+    // Set constant indicating whether enhanced debugging should be shown.
+    define(__NAMESPACE__ . '\DEV_MODE', $cfg['devMode']);
+    
+    // Generate page.
+    insertPageContent($cfg);
 }
 
 /*
-    Generates and outputs the HTML markup for the "main" page (the catalogue
-    page which shows all the available threads).
+    Generates and outputs the HTML markup for the main page content.
 */
-function insertIndexPage($cfg)
+function insertPageContent($cfg)
 {
     $html = '<div class="milkbbs">';
     
-    // Get form for making a new post.
-    $html .= getPostForm($cfg);
+    // Get form for writing a new entry.
+    $html .= generatePostingForm($cfg);
     
-    // Get the threads.
+    // Load the entries from disk.
     $totalNumberOfPages = 0;
     $pageNum = 1;
     if (file_exists($cfg['file']['toc']))
     {
         $toc = json_decode(file_get_contents($cfg['file']['toc']));
         if (!is_array($toc))
-        {
-            displayError($cfg, 'Corrupted table of contents.', true);
-        }
+            displayError('Corrupted table of contents.');
         
         $pageNum = (isset($_GET['pageNum']) && is_numeric($_GET['pageNum'])) ? intval($_GET['pageNum']) : 1;
+        $maxEntriesPerPage = $cfg['maxEntriesPerPage'] > 0 ? min($cfg['maxEntriesPerPage'], count($toc)) : count($toc);
+        $totalNumberOfPages = ceil(count($toc) / $maxEntriesPerPage);
         
-        $totalThreadsPerPage = $cfg['maxThreadsPerPage'] > 0 ? min($cfg['maxThreadsPerPage'], count($toc)) : count($toc);
-        
-        $totalNumberOfPages = ceil(count($toc) / $totalThreadsPerPage);
-        
+        // Constrain page number if it exceeds boundaries.
         if ($pageNum < 1)
-        {
             $pageNum = 1;
-        }
         elseif ($pageNum > $totalNumberOfPages)
-        {
             $pageNum = $totalNumberOfPages;
-        }
         
-        for ($i = (($pageNum - 1) * $totalThreadsPerPage); $i < min(($totalThreadsPerPage * $pageNum), count($toc)); $i++)
+        // Generate HTML for entries.
+        for ($i = (($pageNum - 1) * $maxEntriesPerPage); $i < min(($maxEntriesPerPage * $pageNum), count($toc)); $i++)
         {
-            $threadId = $toc[$i];
-            $threadData = '';
-            
-            if (file_exists($cfg['path']['threads'] . "$threadId.json"))
+            try
             {
-                $threadData = json_decode(file_get_contents($cfg['path']['threads'] . "$threadId.json"), true);
+                $entryData = json_decode_ex(file_get_contents($cfg['path']['entries'] . $toc[$i] . '.json'));
+                $html .= getEntry($cfg, $entryData);
             }
-            
-            if ($threadData)
+            catch (Exception $exc)
             {
-                $html .= getThread($cfg, $threadData, false);
-            }
-            else
-            {
-                $html .= '<div class="milkbbs-thread-container">'
-                       . '<div class="milkbbs-entry">'
-                       . "<div>Post number ($threadId) could not be displayed due to errors.</div>"
-                       . '</div>'
-                       . '</div>'
-                ;
+                $badEntryHtml = $cfg['html']['entryError'];
+                $badEntryHtml = str_replace('{ENTRY_ID}', $toc[$i], $badEntryHtml);
+                $html .= $badEntryHtml;
             }
         }
     }
     
-    // Get the post management section.
-    $html .= getPostManagement($cfg);
+    // Get the entry management section.
+    $html .= getEntryManagement($cfg);
     
     // Get the footer.
     $html .= getFooter($cfg, $totalNumberOfPages, $pageNum);
@@ -109,95 +88,29 @@ function insertIndexPage($cfg)
 }
 
 /*
-    Generates and outputs the HTML markup for an individual thread page.
+    Generates the HTML for the form used for writing new entries.
 */
-function insertThreadPage($cfg)
-{
-    $threadId = (isset($_GET['id']) && is_numeric($_GET['id'])) ? intval($_GET['id']) : 0;
-    
-    if ($threadId === 0)
-    {
-        displayError($cfg, 'Could not display thread, possibly due to bad thread ID. This thread may not exist.', true);
-    }
-    
-    $html = '<div class="milkbbs">';
-    
-    // Get form for replying to an existing thread.
-    $html .= getPostForm($cfg, $threadId);
-    
-    // Get the thread.
-    if (file_exists($cfg['path']['threads'] . "$threadId.json"))
-    {
-        $thread = json_decode(file_get_contents($cfg['path']['threads'] . "$threadId.json"), true);
-    }
-    
-    if ($thread)
-    {
-        $html .= getThread($cfg, $thread, true);
-    }
-    else
-    {
-        displayError($cfg, 'This thread could not be displayed due to errors.', true);
-    }
-    
-    // Get the post management section.
-    $html .= getPostManagement($cfg);
-    
-    // Get the footer.
-    $html .= getFooter($cfg);
-    
-    // Get the JavaScript functions.
-    $html .= getJavaScript($cfg);
-    
-    $html .= '</div>';
-    
-    echo $html;
-}
-
-/*
-    Generates and outputs the HTML markup for the administrative control panel.
-*/
-function insertAdminPage($cfg)
-{
-    $html = '<div class="milkbbs">';
-    
-    $html .= '<p>Admin page!</p>';
-    
-    $html .= '</div>';
-    
-    echo $html;
-}
-
-/*
-    Generates the form used for making new posts, both for creating new threads
-    and for replying to existing threads.
-*/
-function getPostForm($cfg, $threadId = '')
+function generatePostingForm($cfg)
 {
     // Load verification question (if enabled).
     if ($cfg['antiBotVerificationEnabled'])
     {
-        $questions = require_once(dirname(__FILE__) . '/../user-verification-questions.php');
+        $questions = include($cfg['path']['fsLib'] . 'user-verification-questions.php');
         
         if (is_array($questions) && count($questions) > 0)
         {
             $qid = array_rand($questions);
             
-            if (isset($questions[$qid][0]) && isset($questions[$qid][1]))
-            {
-                $q = $questions[$qid][0];
-            }
-            else
-            {
-                displayError($cfg, 'Something went wrong loading the anti-bot verification.', true);
-            }
+            if (!isset($questions[$qid][0]) || !isset($questions[$qid][1]))
+                displayError($cfg, 'Something went wrong loading the anti-bot verification. The data may be corrupt.', true);
+            
+            $q = $questions[$qid][0];
         }
     }
     
     // Build out form.
-    $html = $cfg['template']['form'];
-    $html = str_replace('{PROCESSING_SCRIPT}', $cfg['path']['webLib'] . 'function/process-post.php', $html);
-    $html = str_replace('{PARENT_THREAD_ID}', $threadId, $html);
+    $html = $cfg['html']['form'];
+    $html = str_replace('{PROCESSING_SCRIPT}', $cfg['path']['webLib'] . 'function/process-entry.php', $html);
     $html = str_replace('{ORIGIN_FILE}', $cfg['file']['originFile'], $html);
     
     // Insert verification question (if enabled).
@@ -211,125 +124,82 @@ function getPostForm($cfg, $threadId = '')
     }
     $html = str_replace('{VERIFICATION}', $verification, $html);
     
-    return $html;
-}
-
-/*
-    Generates a thread and its associated posts.
-*/
-function getThread($cfg, $threadData, $showAllReplies = true)
-{
-    $numberOfDisplayedPosts = isset($cfg['maxPostsPerThreadPreview']) && is_numeric($cfg['maxPostsPerThreadPreview']) ? $cfg['maxPostsPerThreadPreview'] : 0;
-    $numberOfDisplayedPosts = $showAllReplies ? count($threadData) : min($numberOfDisplayedPosts, count($threadData));
-    $tdReordered = array_slice($threadData, 0, 1);
-    $threadId = array_shift($tdReordered)['id'];
-    
-    $html = '<div class="milkbbs-thread-container">';
-    
-    // Generate each post for the thread
-    $idx = 1;
-    foreach ($threadData as $p)
-    {
-        // Retrieve and validate post data
-        $p['id'] = (isset($p['id']) && is_numeric($p['id']) && $p['id'] > 0) ? $p['id'] : 0;
-        $p['author'] = isset($p['author']) ? $p['author'] : '';
-        $p['email'] = isset($p['email']) ? $p['email'] : '';
-        $p['url'] = isset($p['url']) ? $p['url'] : '';
-        $p['subject'] = isset($p['subject']) ? $p['subject'] : '';
-        $p['comment'] = isset($p['comment']) ? $p['comment'] : '';
-        $p['date'] = isset($p['date']) ? $p['date'] : '';
-        
-        // Render this thread as bad if certain data was bad or missing.
-        if (
-            $p['id'] === 0
-         || $p['author'] === ''
-         || $p['date'] === ''
-        )
-        {
-            $html .= '<div class="milkbbs-thread-container">'
-                   . '<div class="milkbbs-entry">'
-                   . "<div>Post number ($threadId) could not be displayed due to errors.</div>"
-                   . '</div>'
-                   . '</div>'
-            ;
-            
-            continue;
-        }
-        
-        // Retrieve post template.
-        $html .= $cfg['template']['post'];
-        
-        // Remove tags for unnecessary fields
-        if ($p['email'] === '')
-        {
-            $html = str_replace('<a href="mailto:{EMAIL}">{AUTHOR}</a>', '{AUTHOR}', $html);
-        }
-        
-        if ($p['url'] === '')
-        {
-            $html = str_replace('&nbsp;<a class="milkbbs-post-url" href="{URL}">[URL]</a>', '', $html);
-        }
-        
-        // Escape HTML characters in strings so they aren't parsed.
-        foreach ($p as $key => $val)
-        {
-            if (is_string($val))
-            {
-                $p[$key] = htmlspecialchars($val);
-            }
-        }
-        
-        // Replace template tags with post data.
-        $html = str_replace('{POST_ID}', $p['id'], $html);
-        $html = str_replace('{AUTHOR}', $p['author'], $html);
-        $html = str_replace('{EMAIL}', $p['email'], $html);
-        $html = str_replace('{URL}', $p['url'], $html);
-        $html = str_replace('{SUBJECT}', $p['subject'], $html);
-        $html = str_replace('{COMMENT}', $p['comment'], $html);
-        $html = str_replace('{DATE}', $p['date'], $html);
-        $html = str_replace('{DELETE}', '<a class="milkbbs-post-management-link" href="#milkbbs-post-management">[Delete]</a>', $html);
-        $html = str_replace('{REPORT}', '<a class="milkbbs-post-management-link" href="#milkbbs-post-management">[Report]</a>', $html);
-        $html = str_replace('{ANCHOR}', $cfg['file']['originFile'] . '?page=thread&id=' . $threadId . '#' . $p['id'], $html);
-        
-        // Increment loop counter and break loop if we've hit the display max.
-        if ($idx === $numberOfDisplayedPosts)
-        {
-            break;
-        }
-        
-        $idx++;
-    }
-    
-    // Add reply button if thread is truncated.
-    if (!$showAllReplies)
-    {
-        $html .= '<div class="milkbbs-entry milkbbs-reply"><div><a class="milkbbs-reply" href="' . $cfg['file']['originFile'] . '?page=thread&id=' . $threadId . '">[Reply to this thread...]</a></div></div>';
-    }
-    
-    $html .= '</div>';
-    $html .= '<hr class="milkbbs-hr">';
+    // Insert error message if user previously attempted to posted but it failed.
+    $html = str_replace('{ERROR_MSG}', '<tr><td colspan="2"><div class="milkbbs-posting-forum-error">ERROR HERE!</div></td></tr>', $html);
     
     return $html;
 }
 
 /*
-    Generates the post management section for reporting and deleting posts.
+    Generates the HTML for an individual saved entry.
 */
-function getPostManagement($cfg)
+function getEntry($cfg, $entry)
 {
-    $html = $cfg['template']['postManagement'];
-    $html = str_replace('{PROCESSING_SCRIPT}', $cfg['path']['webLib'] . 'function/process-post.php', $html);
+    // Retrieve and validate entry data
+    $entry['id'] = (isset($entry['id']) && is_numeric($entry['id']) && $entry['id'] > 0) ? $entry['id'] : 0;
+    $entry['author'] = isset($entry['author']) ? $entry['author'] : 'Anonymous';
+    $entry['email'] = isset($entry['email']) ? $entry['email'] : '';
+    $entry['url'] = isset($entry['url']) ? $entry['url'] : '';
+    $entry['subject'] = isset($entry['subject']) ? $entry['subject'] : '';
+    $entry['comment'] = isset($entry['comment']) ? $entry['comment'] : '';
+    $entry['date'] = isset($entry['date']) ? $entry['date'] : '';
+    
+    // Render this thread as bad if certain data was bad or missing.
+    if ($entry['id'] === 0)
+    {
+        throw new Exception('Bad ID for entry number ' . $entry['id']);
+    }
+        
+    // Retrieve entry template.
+    $html = $cfg['html']['entry'];
+    
+    // Remove tags for unnecessary fields
+    if ($entry['email'] === '')
+        $html = str_replace('<a href="mailto:{EMAIL}">{AUTHOR}</a>', '{AUTHOR}', $html);
+    
+    if ($entry['url'] === '')
+        $html = str_replace('&nbsp;<a class="milkbbs-entry-url" href="{URL}">[URL]</a>', '', $html);
+    
+    // Escape HTML characters in strings so they aren't parsed.
+    foreach ($entry as $key => $val)
+    {
+        if (is_string($val))
+        {
+            $entry[$key] = htmlspecialchars($val);
+        }
+    }
+    
+    // Replace template tags with entry data.
+    $html = str_replace('{ENTRY_ID}', $entry['id'], $html);
+    $html = str_replace('{AUTHOR}', $entry['author'], $html);
+    $html = str_replace('{EMAIL}', $entry['email'], $html);
+    $html = str_replace('{URL}', $entry['url'], $html);
+    $html = str_replace('{SUBJECT}', $entry['subject'], $html);
+    $html = str_replace('{COMMENT}', $entry['comment'], $html);
+    $html = str_replace('{DATE}', $entry['date'], $html);
+    $html = str_replace('{DELETE}', '<a href="#milkbbs-post-management">[Delete]</a>', $html);
+    
+    return $html;
+}
+
+/*
+    Generates the HTML for the entry management section used to delete entries.
+*/
+function getEntryManagement($cfg)
+{
+    $html = $cfg['html']['entryManagement'];
+    $html = str_replace('{PROCESSING_SCRIPT}', $cfg['path']['webLib'] . 'function/process-entry.php', $html);
     $html = str_replace('{ORIGIN_FILE}', $cfg['file']['originFile'], $html);
     
     return $html;
 }
 
 /*
-    Generates a footer with the page list and other things.
+    Generates the HTML for the footer with the page list and software info.
 */
 function getFooter($cfg, $totalNumberOfPages = 0, $pageNum = 1)
 {
-    $html = $cfg['template']['footer'];
+    $html = $cfg['html']['footer'];
     
     // Page navigation
     if ($totalNumberOfPages > 0)
@@ -414,26 +284,67 @@ function getFooter($cfg, $totalNumberOfPages = 0, $pageNum = 1)
 function getJavaScript($cfg)
 {
     $html = '<script type="text/javascript">';
-    $html .= file_get_contents($cfg['file']['js']);
+    $html .= $cfg['html']['javascript'];
     $html .= '</script>';
     
     return $html;
 }
 
 /*
-    Outputs an error to the user.
+    Outputs an error to the user and halts further execution.
 */
-function displayError($cfg, $msg = '', $offerSupport)
+function displayError($msg)
 {
-    $html = '<div class="milkbbs-error-container">'
-           . '<div class="milkbbs-error-logo">milkBBS Logo</div>'
-           . '<div class="milkbbs-error-title">milkBBS</div>'
-           . '<div class="milkbbs-error-message">Error: ' . $msg . ($offerSupport ? ' Please contact the server administrator if this issue persists.' : '') . '</div>'
-           . '</div>'
+    $devModeHtml = '';
+    if (defined(__namespace__ . '\DEV_MODE') && namespace\DEV_MODE || !defined(__namespace__ . '\DEV_MODE'))
+        $devModeHtml = '<div class="milkbbs-error-details">' . $msg . '</div>';
+    
+    $html = '<div class="milkbbs">'
+          .     '<div class="milkbbs-error-container">'
+          .         '<div class="milkbbs-error-logo">milkBBS Logo</div>'
+          .         '<div class="milkbbs-error-title">milkBBS</div>'
+          .         '<div class="milkbbs-error-message">An error occurred. Please contact the server administrator if this issue persists.' . '</div>'
+          .         $devModeHtml
+          .     '</div>'
+          . '</div>'
     ;
     
     echo $html;
+    
     exit();
+}
+
+/*
+    This function gets called auotmatically when an error of any type occurs.
+    It will raise an exception, which will then display an error and halt
+    execution if it is not caught and handled accordingly.
+*/
+function customErrorHandler($errno, $errstr, $errfile, $errline)
+{
+    // Escape error string since we're going to display it as HTML.
+    $errstr = htmlspecialchars($errstr);
+    
+    // Build user-friendly markup for reading error details.
+    $msg = "<div>Error Details:</div>"
+         . "<div>Error</div>"
+         . "<div>$errstr</div>"
+         . "<div>File</div>"
+         . "<div>$errfile</div>"
+         . "<div>Line</div>"
+         . "<div>$errline</div>"
+    ;
+    
+    throw new Exception($msg);
+}
+
+/*
+    This function gets called automaticaly when an exception is thrown. It will
+    display an error and halt execution if it is not caught and handled
+    accordingly.
+*/
+function customExceptionHandler($exception)
+{
+    displayError($exception->getMessage());
 }
 
 ?>

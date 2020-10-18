@@ -1,16 +1,18 @@
 <?php
 
+namespace milkbbs;
+
 error_reporting(E_ALL);
 
-// Load common functions
+// Load common functions and data.
 require_once('common-functions.php');
 
 // Load and validate user configuration.
-$cfg = require_once(dirname(__FILE__) . '/../user-config.php');
+$cfg = include(dirname(__FILE__) . '/../user-config.php');
 $cfg = validateUserData($cfg);
 
 // Load system configuration
-$cfg = array_merge($cfg, require_once('data.php'));
+$cfg = array_merge($cfg, loadSystemData());
 
 // Set default time zone.
 date_default_timezone_set($cfg['timezone']);
@@ -22,13 +24,9 @@ if ($_POST)
     {
         savePost($cfg, validatePostData($cfg));
     }
-    else if (isset($_POST['deletePost']))
+    else if (isset($_POST['deletePost']) && $cfg['entryDeletingEnabled'])
     {
         deletePost($cfg);
-    }
-    else if (isset($_POST['reportPost']))
-    {
-        reportPost($cfg);
     }
     else
     {
@@ -180,9 +178,9 @@ function savePost($cfg, $post)
         mkdir($cfg['path']['db']);
     }
     
-    if (!is_dir($cfg['path']['threads']) && !file_exists($cfg['path']['threads']))
+    if (!is_dir($cfg['path']['entries']) && !file_exists($cfg['path']['entries']))
     {
-        mkdir($cfg['path']['threads']);
+        mkdir($cfg['path']['entries']);
     }
     
     // Retrieve table of contents and post counter. Create files if needed.
@@ -199,14 +197,14 @@ function savePost($cfg, $post)
         }
     }
     
-    if (file_exists($cfg['file']['postCount']))
+    if (file_exists($cfg['file']['entryCount']))
     {
-        $postId = file_get_contents($cfg['file']['postCount']);
+        $postId = file_get_contents($cfg['file']['entryCount']);
     }
     else
     {
         $postId = 0;
-        if (!file_put_contents($cfg['file']['postCount'], $postId))
+        if (!file_put_contents($cfg['file']['entryCount'], $postId))
         {
             displayError($cfg, 'No post counter was found. An attempt to initialize it was made, but the attempt failed.', true);
         }
@@ -225,7 +223,7 @@ function savePost($cfg, $post)
     
     // Increment post counter & save new value to disk.
     $postId = intval($postId) + 1;
-    if (!file_put_contents($cfg['file']['postCount'], $postId))
+    if (!file_put_contents($cfg['file']['entryCount'], $postId))
     {
         displayError($cfg, 'Could not update post counter.', true);
     }
@@ -233,62 +231,22 @@ function savePost($cfg, $post)
     // Begin storing data for new post.
     $post['id'] = $postId;
     
-    // Get parent thread ID (if applicable).
-    $parentThreadId = $_POST['parentThreadId'];
-    
     // No parent thread ID found. Post is for a new thread. Create new thread.
-    if (!$parentThreadId)
+    if (!file_exists($cfg['path']['entries'] . "$postId.json"))
     {
-        if (!file_exists($cfg['path']['threads'] . "$postId.json"))
+        $json = json_encode($post, JSON_PRETTY_PRINT);
+        if (!file_put_contents($cfg['path']['entries'] . "$postId.json", $json))
         {
-            $json = json_encode(array($postId => $post), JSON_PRETTY_PRINT);
-            if (!file_put_contents($cfg['path']['threads'] . "$postId.json", $json))
-            {
-                displayError($cfg, "Could not create new thread. Something prevented it from being created in the database.", true);
-            }
-        }
-        else
-        {
-            displayError($cfg, "Could not create new thread. No parent thread ID was found, but the thread for this post number ($postId) exists in the database already.", true);
+            displayError($cfg, "Could not create new thread. Something prevented it from being created in the database.", true);
         }
     }
-    // Parent thread ID found. Post is a reply to an existing thread. Update existing thread with new reply.
     else
     {
-        if (file_exists($cfg['path']['threads'] . $parentThreadId . '.json'))
-        {
-            $threadData = json_decode(file_get_contents($cfg['path']['threads'] . $parentThreadId . '.json'), true);
-            if (!$threadData)
-            {
-                displayError($cfg, "Could not retrieve data for thread number ($parentThreadId) or data is corrupted.", true);
-            }
-            $threadData[$postId] = $post;
-            $threadData = json_encode($threadData, JSON_PRETTY_PRINT);
-            if (!file_put_contents($cfg['path']['threads'] . $parentThreadId . '.json', $threadData))
-            {
-                displayError($cfg, "Could not create new post number ($postId) for thread number ($parentThreadId). Something prevent it from being created in the database.", true);
-            }
-        }    
-        else
-        {
-            displayError($cfg, "Could not reply to thread. Thread number ($parentThreadId) was not located in database.", true);
-        }
+        displayError($cfg, "Could not create new thread. No parent thread ID was found, but the thread for this post number ($postId) exists in the database already.", true);
     }
     
     // Update the table of contents thread index.
-    $threadPos = array_search($parentThreadId, $toc);
-    // If thread exists in ToC, bump it to the top.
-    if ($threadPos !== false)
-    {
-        unset($toc[$threadPos]);
-        array_unshift($toc, intval($parentThreadId));
-        $toc = array_values($toc);
-    }
-    // If thread doesn't exist in ToC, add it to the top
-    else
-    {
-        array_unshift($toc, $postId);
-    }
+    array_unshift($toc, $postId);
     
     // Save updated table of contents.
     $toc = json_encode($toc, JSON_PRETTY_PRINT);
@@ -331,69 +289,41 @@ function deletePost($cfg)
     }
     
     // Retrieve thread data.
-    $threadData = json_decode(file_get_contents($cfg['path']['threads'] . $parentThreadId . '.json'), true);
+    $threadData = json_decode(file_get_contents($cfg['path']['entries'] . $parentThreadId . '.json'), true);
     if (!$threadData)
     {
         displayError($cfg, "Could not delete post number ($postId) as data for thread number ($parentThreadId) could not be retrieved or data is corrupted.", true);
     }
     
-    // Verify post is within this thread.
-    if (!isset($threadData[$postId]))
-    {
-        displayError($cfg, "Could not delete post number ($postId) as it was not found in thread number ($threadId).", true);
-    }
-    
     // Verify post password is correct.
-    if ($password !== $threadData[$postId]['password'])
+    if ($password !== $threadData['password'])
     {
         displayError($cfg, "Could not delete post number ($postId) as the provided password did not match what was in the database.", true);
     }
     
     // Remove post from thread & save thread.
     // If it's the topic thread, then the thread data file should be removed.
-    if ($postId === $parentThreadId)
+    // Remove thread from the table of contents.
+    $threadPos = array_search($parentThreadId, $toc);
+    // If thread exists in ToC, remove it.
+    if ($threadPos !== false)
     {
-        // Remove thread from the table of contents.
-        $threadPos = array_search($parentThreadId, $toc);
-        // If thread exists in ToC, remove it.
-        if ($threadPos !== false)
-        {
-            unset($toc[$threadPos]);
-            $toc = array_values($toc);
-        }
-        
-        // Save updated table of contents.
-        $toc = json_encode($toc, JSON_PRETTY_PRINT);
-        if (!file_put_contents($cfg['file']['toc'], $toc))
-        {
-            displayError($cfg, "Could not delete post/thread number ($postId) as the table of contents could not be updated.", true);
-        }
-        
-        // Delete the thread data file.
-        if (!unlink($cfg['path']['threads'] . $parentThreadId . '.json'))
-        {
-            displayError($cfg, "Could not delete post/thread number ($postId) due to a server error.", true);
-        }
+        unset($toc[$threadPos]);
+        $toc = array_values($toc);
     }
-    // Otherwise, yank the post from the thread and save the thread data.
-    else
-    {
-        unset($threadData[$postId]);
-        
-        $threadData = json_encode($threadData, JSON_PRETTY_PRINT);
-        if (!file_put_contents($cfg['path']['threads'] . $parentThreadId . '.json', $threadData))
-        {
-            displayError($cfg, "Could not delete post number ($postId). Something prevented the database from being updated.", true);
-        }
-    }
-}
-
-/*
-    Saves a post report to the database.
-*/
-function reportPost($cfg)
-{
     
+    // Save updated table of contents.
+    $toc = json_encode($toc, JSON_PRETTY_PRINT);
+    if (!file_put_contents($cfg['file']['toc'], $toc))
+    {
+        displayError($cfg, "Could not delete post/thread number ($postId) as the table of contents could not be updated.", true);
+    }
+    
+    // Delete the thread data file.
+    if (!unlink($cfg['path']['entries'] . $parentThreadId . '.json'))
+    {
+        displayError($cfg, "Could not delete post/thread number ($postId) due to a server error.", true);
+    }
 }
 
 function displayError($cfg, $msg = '', $offerSupport = false)

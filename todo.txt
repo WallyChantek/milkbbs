@@ -13,11 +13,11 @@
 [x] Ability to delete posts
     [x] Client side
     [x] Server side
+[ ] Administrative control panel
+[ ] Ability to report posts (reported posts show up in admin panel)
 [ ] Word filtering based on blacklist in config
     --- Option to either censor or throw error, or throw misleading error upon
         detecting filtered word
-[ ] Administrative control panel
-[ ] Ability to report posts (reported posts show up in admin panel)
 [/] Server-side post data validation
     [x] Field lengths
     [x] Field types (e-mail, url, etc.)
