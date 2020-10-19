@@ -3,15 +3,17 @@
         <div class="milkgb-entry-author"><a href="mailto:{EMAIL}">{AUTHOR}</a>&nbsp;<a class="milkgb-entry-url" href="{URL}">[URL]</a></div>
         <div class="milkgb-entry-number">No. <span class="milkgb-entry-id">{ENTRY_ID}</span></div>
     </div>
-    <div>
+    <div{ROW_STYLE_SUBJECT}>
         <div class="milkgb-entry-subject">{SUBJECT}</div>
     </div>
-    <div>
+    <div{ROW_STYLE_COMMENT}>
         <div class="milkgb-entry-comment">{COMMENT}</div>
+    </div>
+    <div{ROW_STYLE_FILE}>
+        <div class="milkgb-entry-file">[F] {FILE}</div>
     </div>
     <div>
         <div class="milkgb-entry-date">{DATE}</div>
         <div class="milkgb-entry-delete">{DELETE}</div>
     </div>
 </div>
-<hr class="milkgb-hr">

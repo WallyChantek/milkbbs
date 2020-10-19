@@ -17,7 +17,7 @@ return [
     'antiBotVerificationIsCaseSensitive' => false,
     
     // File uploader
-    'fileUploadingEnabled' => false,
+    'fileUploadingEnabled' => true, //  Ensure that "file_uploads = On" is set in php.ini
     'fileTypeListMode' => 'allow', // allow or deny
     'fileTypes' => [
         'jpg',
@@ -35,7 +35,7 @@ return [
     'maxPasswordFieldLength' => 32,
     
     // Board visual display
-    'maxEntriesPerPage' => 10,
+    'maxEntriesPerPage' => 3,
     'maxNavigationPageLinks' => 0, // The visible pages in the navigation bar
     'showSoftwareStamp' => true, // "Running milkGB ver 1.32"
     'timezone' => 'America/New_York',

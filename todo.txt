@@ -26,9 +26,9 @@
         --- I'm pretty sure json_encode() handles this automatically and I don't
             need to worry about it as such
     [ ] Files
-[ ] Post preview
-[ ] Formatting codes with simple editor
+[x] Post preview
 [ ] Validate verification questions/answers upon main page load for a pre-check
+[ ] Formatting codes with simple editor
 [/] Configuration file additions
     [x] Ability to enable/disable anti-bot verification
     [x] Ability to enable/disable anti-bot verification answer case sensitivity
@@ -36,9 +36,14 @@
     [x] Ability to set timezone (overall, even for displaying existing thread
         times; in tandem with this, change time in database to UTC)
     [/] Ability to enable/disable file uploader
+[ ] Avatars
 [ ] Locking mechanism to prevent writing overlaps from multiple posts
 [ ] Validate user configuration data (function is in common-functions.php)
+[ ] Re-consider the template setup
 [ ] Document functions and specify what the parameters are
+[ ] Thorough testing
+    [ ] Main testing, make sure everything works, try to break stuff
+    [ ] Ensure all user config options work
 
 
 [ ] Run through freshly-initialized server & test everything

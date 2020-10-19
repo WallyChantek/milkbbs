@@ -23,6 +23,9 @@ function loadSystemData()
     $data['path']['webLib'] = $webLib;
     $data['path']['db'] = $fsLib. 'db/';
     $data['path']['entries'] = $fsLib . 'db/entries/';
+    $data['path']['webFiles'] = $webLib . 'db/files/';
+    $data['path']['fsFiles'] = $fsLib . 'db/files/';
+    $data['path']['avatars'] = $webLib . 'db/avatars/';
     
     // File locations
     $data['file']['originFile'] = $_SERVER['PHP_SELF'];
@@ -30,7 +33,8 @@ function loadSystemData()
     $data['file']['entryCount'] = $fsLib . 'db/entrycount.txt';
 
     // HTML & JS Templates
-    $data['html']['form'] = file_get_contents($fsLib . 'template/posting-form.html');
+    $data['html']['entryForm'] = file_get_contents($fsLib . 'template/posting-form.html');
+    $data['html']['previewForm'] = file_get_contents($fsLib . 'template/posting-form-preview.html');
     $data['html']['entry'] = file_get_contents($fsLib . 'template/entry.html');
     $data['html']['entryError'] = file_get_contents($fsLib . 'template/entry-error.html');
     $data['html']['entryManagement'] = file_get_contents($fsLib . 'template/entry-management.html');

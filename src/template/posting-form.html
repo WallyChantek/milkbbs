@@ -1,4 +1,4 @@
-<form method="post" action="{PROCESSING_SCRIPT}">
+<form enctype="multipart/form-data" method="post" action="{ACTION}">
     <table class="milkgb-posting-form">
         <tr><td><label for="milkgb-posting-form-author">Name</label></td><td><input type="text" id="milkgb-posting-form-author" name="author" placeholder="Anonymous"></td></tr>
         <tr><td><label for="milkgb-posting-form-email">Email</label></td><td><input type="text" id="milkgb-posting-form-email" name="email"></td></tr>
@@ -6,11 +6,10 @@
         <tr><td><label for="milkgb-posting-form-subject">Subject</label></td><td><input type="text" id="milkgb-posting-form-subject" name="subject"></td></tr>
         <tr><td><label for="milkgb-posting-form-comment">Comment</label></td><td><textarea id="milkgb-posting-form-comment" name="comment"></textarea></td></tr>
         <tr><td><label for="milkgb-posting-form-password">Password</label></td><td><input type="text" id="milkgb-posting-form-password" name="password" placeholder="(optional, for post deletion)"></td></tr>
-        {VERIFICATION}
+        {FILE_UPLOADER}
         <tr>
             <td colspan="2">
-                <input type="hidden" name="callingScript" value="{ORIGIN_FILE}">
-                <input type="submit" name="createNewEntry">
+                <input type="submit" name="createNewEntry" value="Preview Entry">
             </td>
         </tr>
     </table>

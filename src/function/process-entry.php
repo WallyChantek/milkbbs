@@ -30,6 +30,7 @@ date_default_timezone_set('UTC');
 // Only process data if a POST occurred.
 if ($_POST)
 {
+    echo print_r($_FILES, true);
     if (isset($_POST['createNewEntry']))
     {
         createNewEntry($cfg, validateNewEntryData($cfg));
@@ -67,7 +68,7 @@ function validateNewEntryData($cfg)
     $entry = [];
     $entry['date'] = date('Y-m-d H:i');
     $entry['author'] = isset($_POST['author']) ? (string)trim($_POST['author']) : 'Anonymous';
-    $entry['autor'] = $entry['author'] !== '' ? $entry['author'] : 'Anonymous';
+    $entry['author'] = $entry['author'] !== '' ? $entry['author'] : 'Anonymous';
     $entry['email'] = isset($_POST['email']) ? (string)trim($_POST['email']) : '';
     $entry['url'] = isset($_POST['url']) ? (string)trim($_POST['url']) : '';
     $entry['subject'] = isset($_POST['subject']) ? (string)trim($_POST['subject']) : '';
