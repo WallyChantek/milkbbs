@@ -345,20 +345,21 @@ function getFooter($cfg, $totalNumberOfPages = 0, $pageNum = 1)
             }
         }
         
-        $rLower = intval($rLower);
-        $rUpper = intval($rUpper);
+        // Constrain ends if we're exceeding boundaries.
+        $rLower = max((int)$rLower, 1);
+        $rUpper = min((int)$rUpper, $totalNumberOfPages);
+        
+        // Ensure values are integers.
+        $rLower = (int) $rLower;
+        $rUpper = (int) $rUpper;
         
         // Build out page navigation links.
         for ($i = $rLower; $i <= $rUpper; $i++)
         {
             if ($i !== $pageNum)
-            {
                 $n .= '<a href="?pageNum=' . $i . '">[' . $i . ']</a> ';
-            }
             else
-            {
                 $n .= '[' . $i . '] ';
-            }
         }
         $html = str_replace('{PAGES}', $n, $html);
         
@@ -366,14 +367,10 @@ function getFooter($cfg, $totalNumberOfPages = 0, $pageNum = 1)
         if ($totalNumberOfPages > 1)
         {
             if ($pageNum - 1 >= 1)
-            {
                 $html = str_replace('[<]', '<a href="?pageNum='. ($pageNum - 1) .'">[<]</a>', $html);
-            }
             
             if ($pageNum + 1 <= $totalNumberOfPages)
-            {
                 $html = str_replace('[>]', '<a href="?pageNum=' . ($pageNum + 1) . '">[>]</a>', $html);
-            }
         }
     }
     else

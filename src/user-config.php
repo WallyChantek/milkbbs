@@ -36,7 +36,7 @@ return [
     
     // Board visual display
     'maxEntriesPerPage' => 3,
-    'maxNavigationPageLinks' => 0, // The visible pages in the navigation bar
+    'maxNavigationPageLinks' => 5, // The visible pages in the navigation bar
     'showSoftwareStamp' => true, // "Running milkGB ver 1.32"
     'timezone' => 'America/New_York',
     '24HourClock' => true,
