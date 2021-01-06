@@ -1,6 +1,7 @@
 <form enctype="multipart/form-data" method="post" action="{ACTION}">
     <table class="milkgb-posting-form">
-        <tr><td>{ENTRY_PREVIEW}</td></tr>
+        <tr><td><a href="javascript:history.back()">[Return to editing]</a></td></tr>
+        <tr><td><hr class="milkgb-hr">{ENTRY_PREVIEW}<hr class="milkgb-hr"></td></tr>
         {VERIFICATION}
         <tr>
             <td colspan="2">
@@ -10,7 +11,6 @@
                 <input type="hidden" name="subject" value="{INPUT_SUBJECT}">
                 <input type="hidden" name="comment" value="{INPUT_COMMENT}">
                 <input type="hidden" name="password" value="{INPUT_PASSWORD}">
-                <input type="hidden" name="file" value="{INPUT_FILE}">
                 <input type="hidden" name="callingScript" value="{ORIGIN_FILE}">
                 <input type="submit" name="createNewEntry" value="Post New Entry">
             </td>

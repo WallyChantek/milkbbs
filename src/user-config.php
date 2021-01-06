@@ -13,7 +13,7 @@ return [
     'adminPasswordHash' => '$2y$10$0eKxzmKn/y3WVSzkxxyqPurkhom3Xn8j4Iuw5H.qk7pJbX5rNVzLe', // password
     
     // Anti-bot verification
-    'antiBotVerificationEnabled' => false,
+    'antiBotVerificationEnabled' => true,
     'antiBotVerificationIsCaseSensitive' => false,
     
     // File uploader

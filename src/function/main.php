@@ -29,11 +29,6 @@ function loadMilkGB()
     
     // Generate page.
     insertPageContent($cfg);
-    
-    if ($_FILES)
-    {
-        // move_uploaded_file($_FILES['file']['tmp_name'], $cfg['path']['fsFiles'] . $_FILES['file']['name']);
-    }
 }
 
 /*
@@ -117,21 +112,6 @@ function generateNewEntryForm($cfg)
     $html = $cfg['html']['entryForm'];
     $html = str_replace('{ACTION}', '?preview=true', $html);
     
-    // Add file uploader if enabled.
-    if ($cfg['fileUploadingEnabled'])
-    {
-        $fileHtml = '<tr>'
-                  .     '<td><label for="milkgb-posting-form-file">File</label></td>'
-                  .     '<td><input type="file" name="file" id="milkgb-posting-form-file"></td>'
-                  . '</tr>'
-        ;
-        $html = str_replace('{FILE_UPLOADER}', $fileHtml, $html);
-    }
-    else
-    {
-        $html = str_replace('{FILE_UPLOADER}', '', $html);
-    }
-    
     return $html;
 }
 
@@ -182,7 +162,6 @@ function generateNewEntryPreviewForm($cfg)
     $entry['comment'] = isset($_POST['comment']) ? (string)trim($_POST['comment']) : '';
     $entry['comment'] = str_replace("\r\n", '{NEW_LINE}', $entry['comment']);
     $entry['comment'] = str_replace(array("\r", "\n"), '{NEW_LINE}', $entry['comment']);
-    $entry['file'] = isset($_FILES['file']['name']) ? $_FILES['file']['name'] : '';
     $entry['password'] = isset($_POST['password']) ? (string)trim($_POST['password']) : '';
     
     // Populate hidden input fields with user data.
@@ -192,7 +171,6 @@ function generateNewEntryPreviewForm($cfg)
     $html = str_replace('{INPUT_SUBJECT}', $entry['subject'], $html);
     $html = str_replace('{INPUT_COMMENT}', $entry['comment'], $html);
     $html = str_replace('{INPUT_PASSWORD}', $entry['password'], $html);
-    $html = str_replace('{INPUT_FILE}', $entry['file'], $html);
     
     // Generate an entry preview.
     $html = str_replace('{ENTRY_PREVIEW}', getEntry($cfg, $entry, true), $html);
@@ -224,7 +202,6 @@ function getEntry($cfg, $entry, $isPreview = false)
     $entry['url'] = isset($entry['url']) ? $entry['url'] : '';
     $entry['subject'] = isset($entry['subject']) ? $entry['subject'] : '';
     $entry['comment'] = isset($entry['comment']) ? $entry['comment'] : '';
-    $entry['file'] = isset($entry['file']) ? $entry['file'] : '';
     $entry['date'] = isset($entry['date']) ? $entry['date'] : '';
     
     // Render this thread as bad if certain data was bad or missing.
@@ -274,7 +251,6 @@ function getEntry($cfg, $entry, $isPreview = false)
     $html = str_replace('{SUBJECT}', $entry['subject'], $html);
     $html = str_replace('{COMMENT}', $entry['comment'], $html);
     $html = str_replace('{DATE}', $entry['date'], $html);
-    $html = str_replace('{FILE}', $entry['file'], $html);
     if (!$isPreview)
         $html = str_replace('{DELETE}', '<a href="#milkgb-post-management">[Delete]</a>', $html);
     else
@@ -283,7 +259,6 @@ function getEntry($cfg, $entry, $isPreview = false)
     // Hide rows that are empty.
     $html = str_replace('{ROW_STYLE_SUBJECT}', ($entry['subject'] === '' ? ' style="display: none;"' : ''), $html);
     $html = str_replace('{ROW_STYLE_COMMENT}', ($entry['comment'] === '' ? ' style="display: none;"' : ''), $html);
-    $html = str_replace('{ROW_STYLE_FILE}', ($entry['file'] === '' ? ' style="display: none;"' : ''), $html);
     
     return $html;
 }
