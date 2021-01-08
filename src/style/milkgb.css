@@ -43,6 +43,27 @@
 }
 
 
+#milkgb-posting-form-formatting {
+    display: flex;
+}
+
+.milkgb-formatting-button {
+    background: #e8e8e8;
+    padding: 6px;
+    border: 1px solid #a0a0a0;
+    cursor: pointer;
+    margin: 0 2px;
+}
+
+.milkgb-formatting-button:hover {
+    background: #e0e0e0;
+}
+
+.milkgb-formatting-button:active {
+    background: #d0d0d0;
+}
+
+
 
 
 /* -- THEME CSS: BREAK INTO SEPARATE FILE WHEN DONE!!!! -- */
