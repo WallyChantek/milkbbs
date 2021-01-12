@@ -30,7 +30,6 @@ date_default_timezone_set('UTC');
 // Only process data if a POST occurred.
 if ($_POST)
 {
-    echo print_r($_FILES, true);
     if (isset($_POST['createNewEntry']))
     {
         createNewEntry($cfg, validateNewEntryData($cfg));
@@ -61,8 +60,6 @@ function validateNewEntryData($cfg)
         'subject' => $cfg['maxSubjectFieldLength'],
         'comment' => $cfg['maxCommentFieldLength'],
         'password' => $cfg['maxPasswordFieldLength']
-        // 'maxFilenameLength' => (is_numeric($cfg['maxFileNameLength']) ? $cfg['maxFileNameLength'] : 64),
-        // 'maxFileSize' => (is_numeric($cfg['maxFileSizeInBytes']) ? $cfg['maxFileSizeInBytes'] : 1048576)
     ];
     
     $entry = [];

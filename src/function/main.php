@@ -112,6 +112,13 @@ function generateNewEntryForm($cfg)
     $html = $cfg['html']['entryForm'];
     $html = str_replace('{ACTION}', '?preview=true', $html);
     
+    $colorSelector = '<select id="milkgb-formatting-color"><option value="">Color</option>';
+    foreach ($cfg['formattingColors'] as $colorName => $colorVal) {
+        $colorSelector .= "<option value=\"$colorVal\">$colorName</option>";
+    }
+    $colorSelector .= '</select>';
+    $html = str_replace('{FORMATTING_COLOR}', $colorSelector,  $html);
+    
     return $html;
 }
 
@@ -256,11 +263,49 @@ function getEntry($cfg, $entry, $isPreview = false)
     else
         $html = str_replace('<div class="milkgb-entry-delete">{DELETE}</div>', '', $html);
     
+    // Replace style tags with appropriate markup.
+    $html = replaceTags('b', $html, $cfg);
+    $html = replaceTags('i', $html, $cfg);
+    $html = replaceTags('u', $html, $cfg);
+    $html = replaceTags('color=.*?', $html, $cfg);
+    
     // Hide rows that are empty.
     $html = str_replace('{ROW_STYLE_SUBJECT}', ($entry['subject'] === '' ? ' style="display: none;"' : ''), $html);
     $html = str_replace('{ROW_STYLE_COMMENT}', ($entry['comment'] === '' ? ' style="display: none;"' : ''), $html);
     
     return $html;
+}
+
+function replaceTags($pattern, $str, $cfg) {
+    $replacements = [
+        'b' => 'font-weight: bold',
+        'i' => 'font-style: italic',
+        'u' => 'text-decoration: underline',
+        'color=.*?' => 'color: '
+    ];
+    $replacement = $replacements[$pattern];
+    
+    preg_match_all('/\[' . $pattern . '\].*?\[\/' . $pattern . '\]/', $str, $matches);
+    
+    foreach($matches[0] as $m) {
+        preg_match('/\[' . $pattern . '\](.*?)\[\/' . $pattern . '\]/s', $m, $mt);
+        $inside = $mt[1];
+        
+        if ($pattern !== 'color=.*?') {
+            $str = str_replace($m, '<span style="' . $replacement . ';">' . $inside . '</span>', $str);
+        }
+        else {
+            preg_match('/\[color=(.*?)\]/s', $m, $color);
+            if (isset($cfg['formattingColors'][$color[1]])) {
+                $str = str_replace($m, '<span style="color: ' . $cfg['formattingColors'][$color[1]] . ';">' . $inside . '</span>', $str);
+            }
+            else {
+                $str = str_replace($m, $inside, $str);
+            }
+        }
+    }
+    
+    return $str;
 }
 
 /*

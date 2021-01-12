@@ -16,16 +16,6 @@ return [
     'antiBotVerificationEnabled' => true,
     'antiBotVerificationIsCaseSensitive' => false,
     
-    // File uploader
-    'fileUploadingEnabled' => true, //  Ensure that "file_uploads = On" is set in php.ini
-    'fileTypeListMode' => 'allow', // allow or deny
-    'fileTypes' => [
-        'jpg',
-        'zip'
-    ],
-    'maxFileNameLength' => 64,
-    'maxFileSizeInBytes' => 1048576,
-    
     // Max field character lengths
     'maxAuthorFieldLength' => 64,
     'maxEmailFieldLength' => 256,
@@ -43,6 +33,11 @@ return [
     
     // Board functionality
     'entryDeletingEnabled' => true,
+    'formattingColors' => [
+        'red' => '#ff0000',
+        'green' => '#00ff00',
+        'blue' => '#0000ff'
+    ],
     
     // Word filtering
     'wordFilterMode' => 'error', // censor, error, or mislead

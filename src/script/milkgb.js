@@ -22,7 +22,7 @@ milkgb.initMainPage = function() {
         });
         document.getElementById('milkgb-formatting-color').addEventListener('change', function(event) {
             if (this.value !== '') {
-                milkgb.insertTag('milkgb-posting-form-comment', 'color=' + this.value);
+                milkgb.insertTag('milkgb-posting-form-comment', 'color=' + this.options[this.selectedIndex].text);
                 this.selectedIndex = 0;
             }
         });
@@ -52,9 +52,6 @@ milkgb.insertTag = function(textareaId, tag) {
         var tagEnd = '[/' + tag + ']';
         var posStart = elem.selectionStart;
         var posEnd = elem.selectionEnd + tagStart.length;
-        
-        console.log('s: ' + posStart);
-        console.log('e: ' + posEnd);
         
         var newStr = elem.value;
         newStr = [newStr.slice(0, posStart), tagStart, newStr.slice(posStart)].join('');
