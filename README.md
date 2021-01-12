@@ -1,5 +1,5 @@
 # MilkGB
-MilkGB is a simple, flat-file, easy-to-deploy guestbook system. Because we all know how relevant those are these days.<br>I wouldn't advise using this yet as I still have a good bit of testing to do.
+MilkGB is a simple, flat-file, easy-to-deploy guestbook system. Because we all know how relevant those are these days. Still, you could use it as a general comment/feedback form.<br><br>Note: I wouldn't advise using this yet as I still have a good bit of testing to do.
 <p align="center"><img src="https://raw.githubusercontent.com/kevinmaddox/milkgb/main/images/img01.png" alt="MilkGB Preview"/></p>
 
 ## Demo
