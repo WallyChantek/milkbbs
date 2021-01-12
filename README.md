@@ -19,6 +19,7 @@ milkgb\loadMilkGB();
 ## Specification
 ### Configuration (user-config.php)
 | Option | Type | Def. Value | Description |
+| --- | --- | --- | --- |
 | devMode | boolean | false | Blah |
 | adminPasswordHash | string | N/A | Blah |
 | antiBotVerificationEnabled | boolean | true | Blah |
