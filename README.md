@@ -3,7 +3,7 @@ MilkGB is a simple, flat-file, easy-to-deploy guestbook system. Because we all k
 <p align="center"><img src="https://raw.githubusercontent.com/kevinmaddox/milkgb/main/images/img01.png" alt="MilkGB Preview"/></p>
 
 ## Demo
-[MilkGB Demo](https://www.kevinmaddox.com/demo/milkgb/milkgb.html)<br>
+[Coming Soon]<br>
 ## Installation
 1. Copy/paste the `src/` directory to wherever you want to store MilkGB on your web server. This accounts for one deployment.
 1. Edit the configuration file `user-config.php` to configure MilkGB to suit your needs.
