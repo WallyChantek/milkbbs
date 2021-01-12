@@ -27,7 +27,7 @@ return [
     // Board visual display
     'maxEntriesPerPage' => 3,
     'maxNavigationPageLinks' => 5, // The visible pages in the navigation bar
-    'showSoftwareStamp' => true, // "Running milkGB ver 1.32"
+    'showSoftwareStamp' => true, // "Running milkGB ver x.xx"
     'timezone' => 'America/New_York',
     '24HourClock' => true,
     
@@ -40,7 +40,7 @@ return [
     ],
     
     // Word filtering
-    'wordFilterMode' => 'error', // censor, error, or mislead
+    'wordFilterMode' => 'censor', // censor, error, or mislead
     'wordFilters' => [
         'apple',
         'orange'

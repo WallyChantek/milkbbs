@@ -17,6 +17,26 @@ milkgb\loadMilkGB();
 ?>
 ```
 ## Specification
-### Configuration
-
+### Configuration (user-config.php)
+| Option | Type | Def. Value | Description |
+| devMode | boolean | false | Blah |
+| adminPasswordHash | string | N/A | Blah |
+| antiBotVerificationEnabled | boolean | true | Blah |
+| antiBotVerificationIsCaseSensitive | boolean | false | Blah |
+| maxAuthorFieldLength | integer | 64 | Blah |
+| maxEmailFieldLength | integer | 256 | Blah |
+| maxUrlFieldLength | integer | 256 | Blah |
+| maxSubjectFieldLength | integer | 72 | Blah |
+| maxCommentFieldLength | integer | 2048 | Blah |
+| maxPasswordFieldLength | integer | 32 | Blah |
+| maxEntriesPerPage | integer | 10 | Blah |
+| maxNavigationPageLinks | integer | 10 | Blah |
+| showSoftwareStamp | boolean | true | Blah |
+| timezone | string | 'America/New_York' | Blah |
+| 24HourClock | boolean | true | Blah |
+| entryDeletingEnabled | boolean | true | Blah |
+| formattingColors | array[string => string] | red, green, blue colors | Blah |
+| wordFilterMode | string | censor | Blah |
+| wordFilters | array[string] | empty array | Blah |
+| showFilteredWords | boolean | true | Blah |
 ## Notes
