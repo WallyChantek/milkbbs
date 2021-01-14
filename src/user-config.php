@@ -2,7 +2,8 @@
 
 return [
     // Developer mode, enables error details. Set to false when ready to deploy.
-    'devMode' => true,
+    'devMode' => false,
+    'demoMode' => false,
     
     // Admin password for deleting posts.
     // You should generate this on your own by using...
@@ -42,8 +43,6 @@ return [
     // Word filtering
     'wordFilterMode' => 'censor', // censor, error, or mislead
     'wordFilters' => [
-        'apple',
-        'orange'
     ],
     'showFilteredWords' => true // Tells the user what words were filtered when using mode "error"
 ];

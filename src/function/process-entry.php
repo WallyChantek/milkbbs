@@ -30,6 +30,9 @@ date_default_timezone_set('UTC');
 // Only process data if a POST occurred.
 if ($_POST)
 {
+    if ($cfg['demoMode'])
+        displayError('This board is in demonstration mode and actual posting has been disabled.', true, false);
+    
     if (isset($_POST['createNewEntry']))
     {
         createNewEntry($cfg, validateNewEntryData($cfg));
@@ -94,7 +97,7 @@ function validateNewEntryData($cfg)
     // Validate comment.
     if (strlen($entry['comment']) > $maxFieldLengths['comment'])
         displayError('Entry comment cannot exceed (' . $maxFieldLengths['comment'] . ') characters.', true);
-    if (strlen($entry['comment']) > $maxFieldLengths['comment'])
+    if (strlen($entry['comment']) <= 0)
         displayError('Entry comment cannot be empty.', true);
     
     // Handle word filtering.

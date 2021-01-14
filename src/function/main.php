@@ -171,6 +171,18 @@ function generateNewEntryPreviewForm($cfg)
     $entry['comment'] = str_replace(array("\r", "\n"), '{NEW_LINE}', $entry['comment']);
     $entry['password'] = isset($_POST['password']) ? (string)trim($_POST['password']) : '';
     
+    // Generate an entry preview.
+    $html = str_replace('{ENTRY_PREVIEW}', getEntry($cfg, $entry, true), $html);
+    
+    // Escape HTML characters in strings so they aren't parsed.
+    foreach ($entry as $key => $val)
+    {
+        if (is_string($val))
+        {
+            $entry[$key] = htmlspecialchars($val);
+        }
+    }
+    
     // Populate hidden input fields with user data.
     $html = str_replace('{INPUT_AUTHOR}', $entry['author'], $html);
     $html = str_replace('{INPUT_EMAIL}', $entry['email'], $html);
@@ -178,9 +190,6 @@ function generateNewEntryPreviewForm($cfg)
     $html = str_replace('{INPUT_SUBJECT}', $entry['subject'], $html);
     $html = str_replace('{INPUT_COMMENT}', $entry['comment'], $html);
     $html = str_replace('{INPUT_PASSWORD}', $entry['password'], $html);
-    
-    // Generate an entry preview.
-    $html = str_replace('{ENTRY_PREVIEW}', getEntry($cfg, $entry, true), $html);
     
     // Insert verification question (if enabled).
     $verification = '';
@@ -397,6 +406,11 @@ function getFooter($cfg, $totalNumberOfPages = 0, $pageNum = 1)
     {
         $html = str_replace('<div class="milkgb-footer-pages">[<]{PAGES}[>]</div>', '', $html);
     }
+    
+    if ($cfg['showSoftwareStamp'])
+        $html = str_replace('{SOFTWARE_STAMP}', 'Running milkGB v' . $cfg['softwareVersion'], $html);
+    else
+        $html = str_replace('{SOFTWARE_STAMP}', 'Running milkGB v' . $cfg['softwareVersion'], $html);
     
     return $html;
 }

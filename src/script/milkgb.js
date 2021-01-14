@@ -49,7 +49,7 @@ milkgb.insertTag = function(textareaId, tag) {
     var elem = document.getElementById(textareaId);
     if (elem.selectionStart || elem.selectionStart == '0') {
         var tagStart = '[' + tag + ']';
-        var tagEnd = '[/' + tag + ']';
+        var tagEnd = (!tag.includes('color')) ? '[/' + tag + ']' : '[/color]';
         var posStart = elem.selectionStart;
         var posEnd = elem.selectionEnd + tagStart.length;
         

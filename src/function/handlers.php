@@ -39,7 +39,7 @@ function customExceptionHandler($exception)
 /*
     Outputs an error to the user and halts further execution.
 */
-function displayError($msg, $showErrorToUser = false)
+function displayError($msg, $showErrorToUser = false, $showContactNote = true)
 {
     $msgHtml = false;
     $webLib = '';
@@ -70,9 +70,8 @@ function displayError($msg, $showErrorToUser = false)
         // Build HTML.
         $html = '<div class="milkgb">'
               .     '<div class="milkgb-error-container">'
-              .         '<div class="milkgb-error-logo">milkGB Logo</div>'
-              .         '<div class="milkgb-error-title">milkGB</div>'
-              .         '<div class="milkgb-error-message">An error occurred. Please contact the server administrator if this issue persists.</div>'
+              .         '<div class="milkgb-error-title">Error</div>'
+              . ($showContactNote ? '<div class="milkgb-error-message">An error occurred. Please contact the server administrator if this issue persists.</div>' : '')
               .         $msgHtml
               .     '</div>'
               . '</div>'
@@ -99,9 +98,8 @@ function displayError($msg, $showErrorToUser = false)
               .     '<body>'
               .         '<div class="milkgb">'
               .             '<div class="milkgb-error-container milkgb-standalone-error-container">'
-              .                 '<div class="milkgb-error-logo">milkGB Logo</div>'
-              .                 '<div class="milkgb-error-title">milkGB</div>'
-              .                 '<div class="milkgb-error-message">An error occurred. Please contact the server administrator if this issue persists.</div>'
+              .                 '<div class="milkgb-error-title">Error</div>'
+              . ($showContactNote ? '<div class="milkgb-error-message">An error occurred. Please contact the server administrator if this issue persists.</div>' : '')
               .                 $msgHtml
               .                 '<div class="milkbbs-error-return-link"><a href="javascript:history.back()">[Return]</a></div>'
               .             '</div>'

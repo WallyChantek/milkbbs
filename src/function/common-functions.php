@@ -7,6 +7,8 @@ function loadSystemData()
 {
     $data = [];
     
+    $data['softwareVersion'] = '0.70';
+    
     $fsLib = realpath(dirname(__FILE__));
     $webLib = str_replace($_SERVER['DOCUMENT_ROOT'], '', $fsLib);
 
@@ -54,7 +56,44 @@ function loadSystemData()
 
 function validateUserData($cfg)
 {
-    // TODO: Validate all user configuration data
+    if (!isset($cfg['adminPasswordHash']))
+        displayError('Admin password not set.');
+    
+    $defaults = [
+        'devMode' => false,
+        'demoMode' => false,
+        'antiBotVerificationEnabled' => true,
+        'antiBotVerificationIsCaseSensitive' => false,
+        'maxAuthorFieldLength' => 64,
+        'maxEmailFieldLength' => 256,
+        'maxUrlFieldLength' => 256,
+        'maxSubjectFieldLength' => 72,
+        'maxCommentFieldLength' => 2048,
+        'maxPasswordFieldLength' => 32,
+        'maxEntriesPerPage' => 3,
+        'maxNavigationPageLinks' => 5,
+        'showSoftwareStamp' => true,
+        'timezone' => 'America/New_York',
+        '24HourClock' => true,
+        'entryDeletingEnabled' => true,
+        'formattingColors' => [
+            'red' => '#ff0000',
+            'green' => '#00ff00',
+            'blue' => '#0000ff'
+        ],
+        'wordFilterMode' => 'censor',
+        'wordFilters' => [
+            'apple',
+            'orange'
+        ],
+        'showFilteredWords' => true
+    ];
+    
+    foreach($defaults as $k => $v) {
+        if (!isset($cfg[$k])) {
+            $cfg[$k] = $v;
+        }
+    }
     
     return $cfg;
 }

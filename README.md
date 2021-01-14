@@ -3,7 +3,7 @@ MilkGB is a simple, flat-file, easy-to-deploy guestbook system. Because we all k
 <p align="center"><img src="https://raw.githubusercontent.com/kevinmaddox/milkgb/main/images/img01.png" alt="MilkGB Preview"/></p>
 
 ## Demo
-[Coming Soon]<br>
+[MilkGB Demo](http://kevinmaddox.com/demo/milkgb/milkgb.php)<br>
 ## Installation
 1. Copy/paste the `src/` directory to wherever you want to store MilkGB on your web server. This accounts for one deployment.
 1. Edit the configuration file `user-config.php` to configure MilkGB to suit your needs.
@@ -22,6 +22,7 @@ milkgb\loadMilkGB();
 | Option | Type | Def. Value | Description |
 | --- | --- | --- | --- |
 | devMode | boolean | false | Enables error details. Set to false when ready to deploy. |
+| demoMode | boolean | false | Disables posting so that the core board functionality can be shown off without having to worry about needing to moderate it. |
 | adminPasswordHash | string | N/A | The global password used for deleting any posts. Store as previously-hashed value generated via `password_hash("your_pass", PASSWORD_DEFAULT)`. |
 | antiBotVerificationEnabled | boolean | true | Forces user to fill out a verification question when posting. |
 | antiBotVerificationIsCaseSensitive | boolean | false | If enabled, case sensitivity will matter when user fills out an answer ("APPLE" will NOT work if answer is "apple"). Recommended to be false. |
@@ -41,3 +42,8 @@ milkgb\loadMilkGB();
 | wordFilterMode | string | censor | What kind of wordfiltering should be used in comments. Choices are `censor`, `error`, or `mislead`. `censor` will replace words with asterisks, `error` will tell the user there was a filtered word when attempting to post, and `mislead` will throw an error when the user attempts to post, but won't tell them the reason, hopefully causing them to move on from the site (used to potentially filter out abusive/worthless posters). If you don't want to filter any words, simply don't add any in `wordFilters`. |
 | wordFilters | array[string] | empty array | Which words should be filtered in post comments. |
 | showFilteredWords | boolean | true | Whether the user should be notified which words were filtered when `wordFilterMode` is set to `error`. |
+## Todo
+* Thoroughly bug test everything.
+* Better CSS organization.
+* Better-looking error messages (and stylization in general).
+* Code clean-up.
