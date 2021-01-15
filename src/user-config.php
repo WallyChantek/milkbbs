@@ -2,7 +2,7 @@
 
 return [
     // Developer mode, enables error details. Set to false when ready to deploy.
-    'devMode' => false,
+    'devMode' => true,
     'demoMode' => false,
     
     // Admin password for deleting posts.

@@ -22,7 +22,7 @@ function loadSystemData()
     
     // Paths
     $data['path']['fsLib'] = $fsLib;
-    $data['path']['webLib'] = $webLib;
+    $data['path']['webLib'] = '/' . $webLib;
     $data['path']['db'] = $fsLib. 'db/';
     $data['path']['entries'] = $fsLib . 'db/entries/';
     $data['path']['webFiles'] = $webLib . 'db/files/';
