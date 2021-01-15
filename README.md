@@ -3,8 +3,6 @@ Note: This is still heavily a work-in-progress and you are not advised to use th
 MilkGB is a simple, flat-file, easy-to-deploy guestbook system. Because we all know how relevant those are these days. Still, you could use it as a general comment/feedback form.
 <p align="center"><img src="https://raw.githubusercontent.com/kevinmaddox/milkgb/main/images/img01.png" alt="MilkGB Preview"/></p>
 
-## Demo
-[MilkGB Demo](http://kevinmaddox.com/demo/milkgb/milkgb.php)<br>
 ## Installation
 1. Copy/paste the `src/` directory to wherever you want to store MilkGB on your web server. This accounts for one deployment.
 1. Edit the configuration file `user-config.php` to configure MilkGB to suit your needs.
